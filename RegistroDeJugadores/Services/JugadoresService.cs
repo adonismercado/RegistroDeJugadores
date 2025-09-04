@@ -53,15 +53,22 @@ namespace RegistroDeJugadores.Services
 
         public async Task<bool> Guardar(Jugadores jugador)
         {
-            if (!await Existe(jugador.JugadorId))
+            if (!await Existe(jugador.JugadorId) && !await ExisteNombre(jugador.Nombre))
             {
+                if (!await Existe(jugador.JugadorId) && await ExisteNombre(jugador.Nombre))
+                {
+                    return false;
+                }
                 return await Insertar(jugador);
             }
             else
             {
-                return await Modificar(jugador);
+                if (await Existe(jugador.JugadorId) && !await ExisteNombre(jugador.Nombre))
+                {
+                    return await Modificar(jugador);
+                }
+                return false;
             }
-                
         }
 
         public async Task<bool> ExisteNombre(string nombre)
