@@ -32,5 +32,14 @@ namespace RegistroDeJugadores.Services
             return await contexto.Jugadores
                 .FirstOrDefaultAsync(j => j.JugadorId == jugadorId);
         }
+
+        public async Task<bool> Eliminar(int jugadorId)
+        {
+            await using var contexto = await DbFactory.CreateDbContextAsync();
+            return await contexto.Jugadores
+                .AsNoTracking()
+                .Where(j => j.JugadorId == jugadorId)
+                .ExecuteDeleteAsync() > 0;
+        }
     }
 }
