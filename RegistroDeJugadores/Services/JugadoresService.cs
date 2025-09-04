@@ -50,5 +50,18 @@ namespace RegistroDeJugadores.Services
                 .AsNoTracking()
                 .ToListAsync();
         }
+
+        public async Task<bool> Guardar(Jugadores jugador)
+        {
+            if (!await Existe(jugador.JugadorId))
+            {
+                return await Insertar(jugador);
+            }
+            else
+            {
+                return await Modificar(jugador);
+            }
+                
+        }
     }
 }
