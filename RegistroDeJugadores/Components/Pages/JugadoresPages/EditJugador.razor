@@ -54,7 +54,19 @@
     {
         if (JugadorId > 0)
         {
-			Jugador = await jugadoresService.Buscar(JugadorId) ?? new Jugadores();
+            Jugador = await jugadoresService.Buscar(JugadorId) ?? new Jugadores();
+        }
+    }
+
+    public async Task Guardar()
+    {
+        if (await jugadoresService.Guardar(Jugador))
+        {
+            navigationManager.NavigateTo("/Jugador/Index");
+        } 
+        else
+        {
+			errorMensaje = "⚠️ Ya existe un jugador con este nombre: " + Jugador.Nombre;
         }
     }
 }
