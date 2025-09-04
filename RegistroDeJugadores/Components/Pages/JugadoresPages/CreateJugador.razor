@@ -43,5 +43,18 @@
 </EditForm>
 
 @code {
+	public Jugadores Jugador { get; set; } = new Jugadores();
+	private string errorMensaje = null;
 
+	public async Task Guardar()
+	{
+		if (await jugadoresService.Guardar(Jugador))
+		{
+			navigationManager.NavigateTo("/Jugador/Index");
+		}
+		else
+		{
+			errorMensaje = "⚠️ Ya existe un jugador con este nombre ⚠️";
+		}
+	}
 }
