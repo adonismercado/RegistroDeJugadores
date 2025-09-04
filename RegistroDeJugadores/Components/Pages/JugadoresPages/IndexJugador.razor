@@ -66,7 +66,7 @@
 							</a>
 						</td>
 						<td>
-							<button class="btn btn-danger" @onclick="() => Eliminar(jugador.JugadorId)">
+							<button class="btn btn-danger" @onclick="() => ConfimarEliminar(jugador.JugadorId)">
 								<span class="bi bi-trash3-fill"></span>
 							</button>
 						</td>
@@ -74,7 +74,20 @@
 				}
 			</tbody>
 		</table>
+		@if (jugadorAEliminar != null)
+		{
+			<div class="alert alert-warning mt-3">
+				<p><strong>⚠️ Confirmación:</strong></p>
+				<p>
+					¿Seguro que deseas eliminar al jugador
+					<strong>@jugadorAEliminar.Nombre</strong>
+					con <strong>@jugadorAEliminar.Partidas</strong> partidas?
+				</p>
 
+				<button class="btn btn-secondary me-2" @onclick="CancelarEliminar">Cancelar</button>
+				<button class="btn btn-danger" @onclick="EliminarConfirmado">Eliminar</button>
+			</div>
+		}
 	</div>
 </div>
 
@@ -83,6 +96,7 @@
 	public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
 	public string Filtro { get; set; } = string.Empty;
 	public string ValorFiltro { get; set; } = string.Empty;
+	private Jugadores? jugadorAEliminar;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -112,12 +126,23 @@
 		}
 	}
 
+	private void ConfimarEliminar(Jugadores jugador)
+	{
+		jugadorAEliminar = jugador;
+	}
+
+	private void CancelarEliminar()
+	{
+		jugadorAEliminar = null;
+	}
+
 	private async Task Eliminar(int jugadorId)
 	{
-		var eliminar = await jugadoresService.Eliminar(jugadorId);
-		if (eliminar)
+		if (jugadorAEliminar != null)
 		{
+			await jugadoresService.Eliminar(jugadorAEliminar.JugadorId);
 			ListaJugadores = await jugadoresService.GetList(j => j.JugadorId > 0);
+			jugadorAEliminar = null;
 		}
 	}
 }

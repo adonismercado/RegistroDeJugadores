@@ -23,8 +23,11 @@ namespace RegistroDeJugadores.Migrations
 
             modelBuilder.Entity("RegistroDeJugadores.Models.Jugadores", b =>
                 {
-                    b.Property<string>("JugadorId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("JugadorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JugadorId"));
 
                     b.Property<string>("Nombre")
                         .IsRequired()

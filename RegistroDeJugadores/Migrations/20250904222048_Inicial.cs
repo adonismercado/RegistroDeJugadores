@@ -14,7 +14,8 @@ namespace RegistroDeJugadores.Migrations
                 name: "Jugadores",
                 columns: table => new
                 {
-                    JugadorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    JugadorId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Partidas = table.Column<int>(type: "int", nullable: false)
                 },
