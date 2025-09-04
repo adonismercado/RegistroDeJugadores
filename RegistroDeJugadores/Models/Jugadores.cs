@@ -8,8 +8,8 @@ namespace RegistroDeJugadores.Models
         public string JugadorId { get; set; }
 
         [Required(ErrorMessage = "El nombre es obligatorio")]
-        public string Nombre { get; set; }
+        public string Nombre { get; set; } = null!;
 
-        public int Partidas { get; set; }
+        public int Partidas { get; set; } = 0;
     }
 }
