@@ -7,14 +7,14 @@ namespace RegistroDeJugadores.Services
 {
     public class JugadoresService(IDbContextFactory<Contexto> DbFactory)
     {
-        public async Task<bool> Insertar (Jugadores jugador)
+        public async Task<bool> Insertar(Jugadores jugador)
         {
             await using var contexto = await DbFactory.CreateDbContextAsync();
             contexto.Jugadores.Add(jugador);
             return await contexto.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> Modificar (Jugadores jugador)
+        public async Task<bool> Modificar(Jugadores jugador)
         {
             await using var contexto = await DbFactory.CreateDbContextAsync();
             contexto.Update(jugador);
@@ -25,6 +25,12 @@ namespace RegistroDeJugadores.Services
             await using var contexto = await DbFactory.CreateDbContextAsync();
             return await contexto.Jugadores
                 .AnyAsync(j => j.JugadorId == jugadorId);
+        }
+        public async Task<Jugadores?> Buscar(int jugadorId)
+        {
+            await using var contexto = await DbFactory.CreateDbContextAsync();
+            return await contexto.Jugadores
+                .FirstOrDefaultAsync(j => j.JugadorId == jugadorId);
         }
     }
 }
