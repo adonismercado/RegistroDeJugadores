@@ -66,7 +66,7 @@
 							</a>
 						</td>
 						<td>
-							<button class="btn btn-danger" @onclick="() => ConfimarEliminar(jugador.JugadorId)">
+							<button class="btn btn-danger" @onclick="() => ConfimarEliminar(jugador)">
 								<span class="bi bi-trash3-fill"></span>
 							</button>
 						</td>
@@ -85,7 +85,7 @@
 				</p>
 
 				<button class="btn btn-secondary me-2" @onclick="CancelarEliminar">Cancelar</button>
-				<button class="btn btn-danger" @onclick="EliminarConfirmado">Eliminar</button>
+				<button class="btn btn-danger" @onclick="() => EliminarConfirmado(jugadorAEliminar.JugadorId)">Eliminar</button>
 			</div>
 		}
 	</div>
@@ -136,7 +136,7 @@
 		jugadorAEliminar = null;
 	}
 
-	private async Task Eliminar(int jugadorId)
+	private async Task EliminarConfirmado(int jugadorId)
 	{
 		if (jugadorAEliminar != null)
 		{
