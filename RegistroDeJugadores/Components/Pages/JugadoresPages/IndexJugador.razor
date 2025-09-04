@@ -92,9 +92,9 @@
 	{
 		if (ValorFiltro.Trim() != "")
 		{
-			if (Filtro == "JugadorId" && int.TryParse(ValorFiltro, out var id))
+			if (Filtro == "JugadorId" && int.TryParse(ValorFiltro, out var jugadorId))
 			{
-				ListaJugadores = await jugadoresService.GetList(j => j.JugadorId == id);
+				ListaJugadores = await jugadoresService.GetList(j => j.JugadorId == jugadorId);
 			}
 			else if (Filtro == "Nombre")
 			{
@@ -106,6 +106,15 @@
 			}
 		} 
 		else
+		{
+			ListaJugadores = await jugadoresService.GetList(j => j.JugadorId > 0);
+		}
+	}
+
+	private async Task Eliminar(int jugadorId)
+	{
+		var eliminar = await jugadoresService.Eliminar(jugadorId);
+		if (eliminar)
 		{
 			ListaJugadores = await jugadoresService.GetList(j => j.JugadorId > 0);
 		}
