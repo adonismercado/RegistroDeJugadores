@@ -20,5 +20,11 @@ namespace RegistroDeJugadores.Services
             contexto.Update(jugador);
             return await contexto.SaveChangesAsync() > 0;
         }
+        public async Task<bool> Existe(int jugadorId)
+        {
+            await using var contexto = await DbFactory.CreateDbContextAsync();
+            return await contexto.Jugadores
+                .AnyAsync(j => j.JugadorId == jugadorId);
+        }
     }
 }
