@@ -8,7 +8,7 @@
 <div class="container">
 	<div class="card shadow-lg">
 		<div class="card-header space-between">
-			<h5 class="card-title">Registro de Jugadores</h5>
+			<h5 class="card-title"><strong>Registro de Jugadores</strong></h5>
 			<a href="/Jugador/Create" class="btn btn-primary"> <span class="bi bi-plus-square-fill-nav-menu mt-3"></span> Crear</a>
 		</div>
 
@@ -16,7 +16,7 @@
 			@*labels*@
 			<div class="row">
 				<div class="col-3">
-					<label class="col-form-label"><strong>Filtrar por</strong></label>
+					<label class="col-form-label ms-1"><strong>Filtrar por</strong></label>
 				</div>
 
 				<div class="col-4">
@@ -25,9 +25,9 @@
 			</div>
 		</div>
 
-		<div class="row align-items-center">
+		<div class="row align-items-center mb-4">
 			<div class="col-3">
-				<InputSelect class="form-select" @bind-value="Filtro">
+				<InputSelect class="form-select ms-3" @bind-value="Filtro">
 					<option value="" selected disabled>Elija una opcion</option>
 					<option value="JugadorId">JugadorId</option>
 					<option value="Nombre">Nombre</option>
@@ -37,8 +37,8 @@
 
 			<div class="col-4">
 				<div class="input-group">
-					<input class="form-control" @bind="ValorFiltro" placeholder="Buscar"/>
-					<button type="button" class="btn btn-primary bi bi-search" onclick="Buscar"> Buscar</button>
+					<input class="form-control ms-2" @bind="ValorFiltro" placeholder="Buscar"/>
+					<button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"> Buscar</button>
 				</div>
 			</div>
 		</div>
@@ -46,11 +46,11 @@
 		<table class="table table-hover">
 			<thead class="table table-striped text-black">
 				<tr>
-					<th>JugadorId</th>
-					<th>Nombre</th>
-					<th>Partidas</th>
-					<th>Editar</th>
-					<th>Eliminar</th>
+					<th>JUGADOR ID</th>
+					<th>NOMBRE</th>
+					<th>PARTIDAS</th>
+					<th>EDITAR</th>
+					<th>ELIMINAR</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -67,7 +67,7 @@
 						</td>
 						<td>
 							<button class="btn btn-danger" @onclick="() => ConfimarEliminar(jugador)">
-								<span class="bi bi-trash3-fill"></span>
+								<span class="bi bi-trash1-fill"></span>
 							</button>
 						</td>
 					</tr>
@@ -105,7 +105,7 @@
 
 	private async Task Buscar()
 	{
-		if (ValorFiltro.Trim() != "")
+		if (!string.IsNullOrWhiteSpace(ValorFiltro))
 		{
 			if (Filtro == "JugadorId" && int.TryParse(ValorFiltro, out var jugadorId))
 			{
