@@ -41,5 +41,14 @@ namespace RegistroDeJugadores.Services
                 .Where(j => j.JugadorId == jugadorId)
                 .ExecuteDeleteAsync() > 0;
         }
+
+        public async Task<List<Jugadores>> GetList(Expression<Func<Jugadores, bool>> criterio)
+        {
+            await using var contexto = await DbFactory.CreateDbContextAsync();
+            return await contexto.Jugadores
+                .Where(criterio)
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }
