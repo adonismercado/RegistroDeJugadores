@@ -63,5 +63,12 @@ namespace RegistroDeJugadores.Services
             }
                 
         }
+
+        public async Task<bool> ExisteNombre(string nombre)
+        {
+            await using var contexto = await DbFactory.CreateDbContextAsync();
+            return await contexto.Jugadores
+                .AnyAsync(j => j.Nombre.ToLower().Trim().Equals(nombre.ToLower().Trim()));
+        }
     }
 }
