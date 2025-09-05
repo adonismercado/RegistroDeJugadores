@@ -49,7 +49,7 @@
     public int JugadorId { get; set; }
 
     public Jugadores Jugador { get; set; } = new Jugadores();
-    private string errorMensaje = null;
+	private string errorMensaje = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
