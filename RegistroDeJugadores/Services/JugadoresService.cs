@@ -119,7 +119,8 @@ namespace RegistroDeJugadores.Services
                 {
                     throw new InvalidOperationException("El jugador con este ID y este nombre ya existe.");
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new ApplicationException("Error al guardar el jugador", ex);
             }
@@ -137,5 +138,6 @@ namespace RegistroDeJugadores.Services
             {
                 throw new ApplicationException("Error al verificar la existencia del nombre del jugador", ex);
             }
+        }
     }
 }
