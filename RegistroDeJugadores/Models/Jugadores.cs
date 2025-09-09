@@ -2,7 +2,7 @@
 
 namespace RegistroDeJugadores.Models;
 
-    public class Jugadores
+public class Jugadores
 {
     [Key]
     public int JugadorId { get; set; }
