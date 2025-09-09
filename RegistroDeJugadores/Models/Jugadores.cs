@@ -9,7 +9,7 @@ public class Jugadores
 
     [Required(ErrorMessage = "El nombre es obligatorio")]
     public string Nombre { get; set; } = null!;
-
+    
     public int Partidas { get; set; } = 0;
 }
 
