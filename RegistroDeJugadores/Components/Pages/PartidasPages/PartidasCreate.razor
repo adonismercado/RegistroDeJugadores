@@ -1,0 +1,128 @@
+﻿@page "/Partida/Create"
+@inject JugadoresService jugadoresService
+@inject PartidasService partidasService
+@inject NavigationManager navigationManager
+
+<PageTitle>Crear Partida</PageTitle>
+<EditForm Model="Partida" OnValidSubmit="Guardar">
+	<DataAnnotationsValidator />
+
+	<div class="container">
+		<div class="card shadow-lg">
+			<div class="card-header text-center">
+				<h5 class="card-title">Crear Partida</h5>
+			</div>
+
+
+			<div class="card-body">
+				@*PartidaID*@
+				<div class="card-body">
+					<div class="mb-3">
+						<label class="form-label"><strong>PartidaID</strong></label>
+						<InputNumber class="form-control" @bind-Value="Partida.PartidaId" readonly></InputNumber>
+					</div>
+				</div>
+
+				@*Jugador1ID*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Jugador1 ID</strong></label>
+					<InputSelect class="form-control form-select" @bind-Value="Partida.Jugador1Id">
+						<option>-- Elije un Jugador --</option>
+						@foreach (var jugador in ListaJugadores)
+						{
+							<option value="@jugador.JugadorId">@jugador.Nombre</option>
+						}
+					</InputSelect>
+				</div>
+
+				@*Jugador2ID*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Jugador2 ID</strong></label>
+					<InputSelect class="form-control form-select" @bind-Value="Partida.Jugador2Id">
+						<option>-- Elije un Jugador --</option>
+						@foreach (var jugador in ListaJugadores)
+						{
+							<option value="@jugador.JugadorId">@jugador.Nombre</option>
+						}
+					</InputSelect>
+				</div>
+
+				@*EstadoPartida*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Estado Partida</strong></label>
+					<InputText class="form-control" @bind-Value="Partida.EstadoPartida"></InputText>
+				</div>
+
+				@*Ganador ID*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Ganador ID</strong></label>
+					<InputSelect class="form-control form-select" @bind-Value="Partida.GanadorId">
+						<option>-- Elije un Jugador --</option>
+						@foreach (var jugador in ListaJugadores)
+						{
+							<option value="@jugador.JugadorId">@jugador.Nombre</option>
+						}
+					</InputSelect>
+				</div>
+
+				@*TurnoJugador*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Turno Jugador ID</strong></label>
+					<InputNumber class="form-control" @bind-Value="Partida.TurnoJugadorId"></InputNumber>
+				</div>
+
+				@*Estado Tablero*@
+				<div>
+					<label class="form-label"><strong>Estado Tablero</strong></label>
+					<InputText class="form-control" @bind-Value="Partida.EstadoTablero"></InputText>
+				</div>
+
+				@*Fecha Inicio*@
+				<div class="mt-3">
+					<label class="form-label"><strong>Fecha Inicio</strong></label>
+					<InputDate class="form-control" @bind-Value="Partida.FechaInicio"></InputDate>
+				</div>
+
+				@*Fecha Fin*@
+				<div class="mt-3">
+					<label class="form-label"><strong>Fecha Fin</strong></label>
+					<InputDate class="form-control" @bind-Value="Partida.FechaFin"></InputDate>
+				</div>
+
+				<div class="card-footer text-center mt-2">
+					<a href="/Partida/Index" class="btn btn-secondary">
+						<span class="bi bi-arrow-left"></span>
+					</a>
+					<button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</EditForm>
+@Mensaje
+
+
+@code {
+	public Partidas Partida { get; set; } = new Partidas();
+	public string Mensaje { get; set; } = string.Empty;
+	public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		ListaJugadores = await jugadoresService.GetList(j => j.JugadorId > 0);
+	}
+
+	public async Task Guardar()
+	{
+		var creado = await partidasService.Guardar(Partida);
+
+		if (creado)
+		{
+			navigationManager.NavigateTo("/Partida/Index");
+		}
+		else
+		{
+			Mensaje = ("No se pudo guardar correctamente");
+		}
+	}
+}
