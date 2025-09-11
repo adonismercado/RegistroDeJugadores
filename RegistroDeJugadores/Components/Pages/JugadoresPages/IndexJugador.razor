@@ -8,89 +8,73 @@
 <div class="container">
 	<div class="card shadow-lg">
 		<div class="card-header d-flex justify-content-between align-items-center">
-			<h5 class="card-title mx-auto mb-0"><strong>Index de Jugadores</strong></h5>
+			<h5 class="card-title mb-0"><strong>Index de Jugadores</strong></h5>
+			<a href="/Jugador/Create" class="btn btn-primary"><span class="bi bi-plus-square mt-3"></span> Crear</a>
 		</div>
 
 		<div class="card-body">
-			@*labels*@
 			<div class="row">
-				<div class="col-md-3">
-					<label class="col-form-label mb-2"><strong>Filtrar por</strong></label>
-				</div>
-				<div class="col-md-3"> 
-					<label class="col-form-label mb-1"><strong>Buscar</strong></label>
-				</div>
-				<div class="col-5 d-flex justify-content-end align-items-center">
-					<a href="/Jugador/Create" class="btn btn-primary"><span class="bi bi-plus-square me-1"></span> Crear</a>
+				@*Filtrar Por*@
+				<div class="col-3">
+					<label class="col-form-label"><strong>Filtrar Por</strong></label>
 				</div>
 
-			</div>
-		</div>
-
-		<div class="row align-items-center mb-4">
-			<div class="col-3">
-				<InputSelect class="form-select ms-3" @bind-value="Filtro">
-					<option value="" selected disabled>Elija una opcion</option>
-					<option value="JugadorId">JugadorId</option>
-					<option value="Nombre">Nombre</option>
-					<option value="Partidas">Partidas</option>
-				</InputSelect>
-			</div>
-
-			<div class="col-4">
-				<div class="input-group">
-					<input class="form-control ms-2" @bind="ValorFiltro" placeholder="Buscar" />
-					<button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"> Buscar</button>
+				@*Busqueda*@
+				<div class="col-4">
+					<label class="col-form-label"><strong>Buscar</strong></label>
 				</div>
 			</div>
-		</div>
 
-		<table class="table table-hover table-striped table-bordered align-middle text-center">
-			<thead class="table-success">
-				<tr>
-					<th>JUGADOR ID</th>
-					<th>NOMBRE</th>
-					<th>PARTIDAS</th>
-					<th>EDITAR</th>
-					<th>ELIMINAR</th>
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (var jugador in ListaJugadores)
-				{
+			<div class="row align-items-center">
+				@*filtro*@
+				<div class="col-3">
+					<InputSelect class="form-select" @bind-Value="Filtro">
+						<option value="" selected disabled>Elija una opci&oacute;n</option>
+						<option value="JugadorId">JugadorId</option>
+						<option value="Nombre">Nombre</option>
+						<option value="Partidas">Partidas</option>
+					</InputSelect>
+				</div>
+
+				@*Busqueda*@
+				<div class="col-4">
+					<div class="input-group">
+						<input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
+						<button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
+					</div>
+				</div>
+			</div>
+
+			<table class="table table-hover table-striped table-bordered align-middle text-center mt-3">
+				<thead class="table table-striped text-black">
 					<tr>
-						<td>@jugador.JugadorId</td>
-						<td>@jugador.Nombre</td>
-						<td>@jugador.Partidas</td>
-						<td>
-							<a href="/Jugador/Edit/@jugador.JugadorId" class="btn btn-outline-warning btn-sm align-items-center">
-								<span class="bi bi-pencil"></span>
-							</a>
-						</td>
-						<td>
-							<button class="btn btn-outline-danger btn-sm align-items-center" @onclick="() => ConfimarEliminar(jugador)">
-								<span class="bi bi-trash"></span>
-							</button>
-						</td>
+						<th>JUGADOR ID</th>
+						<th>NOMBRE</th>
+						<th>PARTIDAS</th>
+						<th>OPCIONES</th>
 					</tr>
-				}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					@foreach (var jugador in ListaJugadores)
+					{
+						<tr>
+							<td>@jugador.JugadorId</td>
+							<td>@jugador.Nombre</td>
+							<td>@jugador.Partidas</td>
+							<td>
+								<a href="/Jugador/Edit/@jugador.JugadorId" class="btn btn-outline-primary">
+									<span class="bi bi-pencil"></span>
+								</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
 
-		@if (jugadorAEliminar != null)
-		{
-			<div class="alert alert-warning mt-3">
-				<p><strong>⚠️ Confirmación:</strong></p>
-				<p>
-					¿Seguro que deseas eliminar al jugador
-					<strong>@jugadorAEliminar.Nombre</strong>
-					con <strong>@jugadorAEliminar.Partidas</strong> partidas?
-				</p>
-
-				<button class="btn btn-secondary me-2" @onclick="CancelarEliminar">Cancelar</button>
-				<button class="btn btn-danger" @onclick="() => EliminarConfirmado(jugadorAEliminar.JugadorId)">Eliminar</button>
-			</div>
-		}
+		<div class="card-footer space-between">
+			<label><strong>Cantidad: @ListaJugadores.Count()</strong></label>
+		</div>
 	</div>
 </div>
 
@@ -99,7 +83,6 @@
 	public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
 	public string Filtro { get; set; } = string.Empty;
 	public string ValorFiltro { get; set; } = string.Empty;
-	private Jugadores? jugadorAEliminar;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -126,26 +109,6 @@
 		else
 		{
 			ListaJugadores = await jugadoresService.GetList(j => j.JugadorId > 0);
-		}
-	}
-
-	private void ConfimarEliminar(Jugadores jugador)
-	{
-		jugadorAEliminar = jugador;
-	}
-
-	private void CancelarEliminar()
-	{
-		jugadorAEliminar = null;
-	}
-
-	private async Task EliminarConfirmado(int jugadorId)
-	{
-		if (jugadorAEliminar != null)
-		{
-			await jugadoresService.Eliminar(jugadorAEliminar.JugadorId);
-			ListaJugadores = await jugadoresService.GetList(j => j.JugadorId > 0);
-			jugadorAEliminar = null;
 		}
 	}
 }
