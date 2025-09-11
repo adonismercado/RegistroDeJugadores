@@ -1,0 +1,129 @@
+﻿@page "/Partida/Create"
+
+@inject JugadoresService jugadoresService
+@inject PartidasService partidasService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Crear Partida</PageTitle>
+<EditForm Model="Partida" OnValidSubmit="Guardar" FormName="CreateForm">
+	<DataAnnotationsValidator />
+
+	<div class="container">
+		<div class="card shadow-lg">
+			<div class="card-header text-center">
+				<h5 class="card-title">Crear Partida</h5>
+			</div>
+
+			<div class="card-body">
+
+				@*Partida ID*@
+				<div class="mb-3">
+					<label class="form-label"><strong>PartidaID</strong></label>
+					<InputNumber class="form-control" @bind-Value="Partida.PartidaId" readonly></InputNumber>
+				</div>
+
+				@*Jugador1ID*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Jugador1ID</strong></label>
+					<InputSelect class="form-control form-select" @bind-Value="Partida.Jugador1Id">
+						<option>-- Elije un Jugador --</option>
+						@foreach (var jugador in ListaJugadores)
+						{
+							<option value="@jugador.JugadorId">@jugador.Nombre</option>
+						}
+					</InputSelect>
+				</div>
+
+				@*Jugador2ID*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Jugador2ID</strong></label>
+					<InputSelect class="form-control form-select" @bind-Value="Partida.Jugador2Id">
+						<option>-- Elije un Jugador --</option>
+						@foreach (var jugador in ListaJugadores)
+						{
+							<option value="@jugador.JugadorId">@jugador.Nombre</option>
+						}
+					</InputSelect>
+				</div>
+
+				@*EstadoPartida*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Estado Partida</strong></label>
+					<InputText class="form-control" @bind-Value="Partida.EstadoPartida"></InputText>
+				</div>
+
+				@*GanadorID*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Ganador ID</strong></label>
+					<InputSelect class="form-control form-select" @bind-Value="Partida.GanadorId">
+						<option value="">-- Elije un Jugador --</option>
+						@foreach (var jugador in ListaJugadores)
+						{
+							<option value="@jugador.JugadorId">@jugador.Nombre</option>
+						}
+					</InputSelect>
+				</div>
+
+				@*TurnoJugadorID*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Turno JugadorID</strong></label>
+					<InputSelect class="form-control form-select" @bind-Value="Partida.TurnoJugadorId">
+						<option value="">-- Elije un Jugador --</option>
+						@foreach (var jugador in ListaJugadores)
+						{
+							<option value="@jugador.JugadorId">@jugador.Nombre</option>
+						}
+					</InputSelect>
+				</div>
+
+				@*EstadoTablero*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Estado Tablero</strong></label>
+					<InputText class="form-control" @bind-Value="Partida.EstadoTablero"></InputText>
+				</div>
+
+				@*FechaInicio*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Fecha Inicio</strong></label>
+					<InputDate class="form-control" @bind-Value="Partida.FechaInicio"></InputDate>
+				</div>
+
+				@*FechaFin*@
+				<div class="mb-3">
+					<label class="form-label"><strong>Fecha Fin</strong></label>
+					<InputDate class="form-control" @bind-Value="Partida.FechaFin"></InputDate>
+				</div>
+			</div>
+
+			<div class="card-footer text-center">
+				<a href="/Partida/Index" class="btn btn-secondary"><span class="bi bi-arrow-left"></span> Volver</a>
+				<button type="submit" class="btn btn-primary bi bi-save me-1"> Guardar</button>
+			</div>
+		</div>
+	</div>
+</EditForm>
+
+@code {
+	public Partidas Partida { get; set; } = new Partidas();
+	private string errorMensaje = string.Empty;
+	public List<Jugadores> ListaJugadores = new List<Jugadores>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		ListaJugadores = await jugadoresService.GetList(j => j.JugadorId > 0);
+	}
+	public async Task Guardar()
+	{
+		var creado = await partidasService.Guardar(Partida);
+
+		if (creado)
+		{
+			navigationManager.NavigateTo("/Partida/Index");
+		}
+		else
+		{
+			errorMensaje = ("No se pudo guardar correctamente");
+		}
+	}
+}
