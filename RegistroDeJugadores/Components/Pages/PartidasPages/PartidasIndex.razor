@@ -130,10 +130,6 @@
 			{
 				ListaPartidas = await partidasService.GetList(p => p.TurnoJugadorId == turnoJugadorId);
 			}
-			if (Filtro == "EstadoTablero")
-			{
-				ListaPartidas = await partidasService.GetList(p => p.EstadoTablero.ToLower().Contains(ValorFiltro));
-			}
 		}
 		else
 		{

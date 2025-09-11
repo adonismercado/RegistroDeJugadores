@@ -22,7 +22,6 @@ namespace RegistroDeJugadores.Migrations
                     EstadoPartida = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     GanadorId = table.Column<int>(type: "int", nullable: true),
                     TurnoJugadorId = table.Column<int>(type: "int", nullable: false),
-                    EstadoTablero = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
                     FechaInicio = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FechaFin = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
