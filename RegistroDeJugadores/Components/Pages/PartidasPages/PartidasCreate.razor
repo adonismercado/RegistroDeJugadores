@@ -4,7 +4,7 @@
 @inject NavigationManager navigationManager
 
 <PageTitle>Crear Partida</PageTitle>
-<EditForm Model="Partida" OnValidSubmit="Guardar">
+<EditForm Model="Partida" OnValidSubmit="Guardar" FormName="CreateForm">
 	<DataAnnotationsValidator />
 
 	<div class="container">
@@ -16,11 +16,9 @@
 
 			<div class="card-body">
 				@*PartidaID*@
-				<div class="card-body">
-					<div class="mb-3">
-						<label class="form-label"><strong>PartidaID</strong></label>
-						<InputNumber class="form-control" @bind-Value="Partida.PartidaId" readonly></InputNumber>
-					</div>
+				<div class="mb-3">
+					<label class="form-label"><strong>PartidaID</strong></label>
+					<InputNumber class="form-control" @bind-Value="Partida.PartidaId" readonly></InputNumber>
 				</div>
 
 				@*Jugador1ID*@
@@ -91,7 +89,7 @@
 
 				<div class="card-footer text-center mt-2">
 					<a href="/Partida/Index" class="btn btn-secondary">
-						<span class="bi bi-arrow-left"></span>
+						<span class="bi bi-arrow-left"></span> Volver
 					</a>
 					<button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
 				</div>
@@ -103,7 +101,7 @@
 
 
 @code {
-	public Partidas Partida { get; set; } = new Partidas();
+	public Partidas Partida { get; set; } = new Partidas()
 	public string Mensaje { get; set; } = string.Empty;
 	public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
 
