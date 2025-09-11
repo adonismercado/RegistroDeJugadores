@@ -7,7 +7,7 @@ public class Partidas
 {
     [Key]
     public int PartidaId { get; set; }
-
+    [Required(ErrorMessage = "Debes seleccionar 1 jugador")]
     public int Jugador1Id { get; set; }
     public int? Jugador2Id { get; set; }
 
@@ -16,6 +16,7 @@ public class Partidas
     public string EstadoPartida { get; set; } = string.Empty;
 
     public int? GanadorId { get; set; }
+    [Required(ErrorMessage = "TurnoJugadorID es obligatorio")]
     public int TurnoJugadorId { get; set; }
 
     [StringLength(9)]
