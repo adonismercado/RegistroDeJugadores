@@ -70,11 +70,11 @@
 					{
 						<tr>
 							<td>@partida.PartidaId</td>
-							<td>@partida.Jugador1Id</td>
-							<td>@partida.Jugador2Id</td>
+							<td>@partida.Jugador1?.Nombre</td>
+							<td>@partida.Jugador2?.Nombre</td>
 							<td>@partida.EstadoPartida</td>
-							<td>@partida.GanadorId</td>
-							<td>@partida.TurnoJugadorId</td>
+							<td>@partida.Ganador?.Nombre</td>
+							<td>@partida.TurnoJugador?.Nombre</td>
 							<td>@partida.FechaInicio.ToString("dd/MM/yyyy")</td>
 							<td>@partida.FechaFin?.ToString("dd/MM/yyyy")</td>
 
