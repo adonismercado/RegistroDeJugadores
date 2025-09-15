@@ -33,6 +33,7 @@
 							<option value="@jugador.JugadorId">@jugador.Nombre</option>
 						}
 					</InputSelect>
+					<ValidationMessage For="(() => Partida.Jugador1)"></ValidationMessage>
 				</div>
 
 				@*Jugador2ID*@
@@ -51,6 +52,7 @@
 				<div class="mb-3">
 					<label class="form-label"><strong>Estado Partida</strong></label>
 					<InputText class="form-control" @bind-Value="Partida.EstadoPartida"></InputText>
+					<ValidationMessage For="(() => Partida.EstadoPartida)"></ValidationMessage>
 				</div>
 
 				@*GanadorID*@
@@ -75,6 +77,7 @@
 							<option value="@jugador.JugadorId">@jugador.Nombre</option>
 						}
 					</InputSelect>
+					<ValidationMessage For="(() => Partida.TurnoJugadorId)"></ValidationMessage>
 				</div>
 
 				@*FechaInicio*@

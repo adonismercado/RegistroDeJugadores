@@ -7,8 +7,9 @@ public class Partidas
 {
     [Key]
     public int PartidaId { get; set; }
+
     [Required(ErrorMessage = "Debes seleccionar 1 jugador")]
-    public int Jugador1Id { get; set; }
+    public int? Jugador1Id { get; set; }
     public int? Jugador2Id { get; set; }
 
     [Required(ErrorMessage = "El EstadoPartida es obligatorio.")]
@@ -17,7 +18,7 @@ public class Partidas
 
     public int? GanadorId { get; set; }
     [Required(ErrorMessage = "TurnoJugadorID es obligatorio")]
-    public int TurnoJugadorId { get; set; }
+    public int? TurnoJugadorId { get; set; }
 
     public DateTime FechaInicio { get; set; } = DateTime.UtcNow;
     public DateTime? FechaFin { get; set; }
