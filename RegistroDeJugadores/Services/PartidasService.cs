@@ -48,9 +48,12 @@ public class PartidasService(IDbContextFactory<Contexto> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Partidas
-            .Where(criterio)
-            .AsNoTracking()
-            .ToListAsync();
+        .Include(p => p.Jugador1)
+        .Include(p => p.Jugador2)
+        .Include(p => p.Ganador)
+        .Include(p => p.TurnoJugador)
+        .Where(criterio)
+        .ToListAsync();
     }
 
     public async Task<bool> Guardar(Partidas partida)
