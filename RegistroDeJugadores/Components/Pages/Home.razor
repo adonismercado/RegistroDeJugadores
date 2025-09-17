@@ -1,24 +1,27 @@
 ﻿@page "/"
 
+@inject PlayerTypeService playerTypeService
+@inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 <div class="container mx-auto max-w-lg display-6 bg-white rounded-lg shadow-xl text-center">
 	<div class="game-container">
-		@if (!gameStarted)
+		@if (!playerTypeService.gameStarted)
 		{
 			<!-- Pantalla de Seleccion del Jugador -->
 			<div class="selection-screen">
 				<h1>Elige los jugadores</h1>
+
 				<div class="player-buttons">
 					@*Jugador X*@
-					<button class="btn @(playerTypeSelection == PlayerType.X
+					<button class="btn @(playerTypeService.playerTypeSelection == PlayerType.X
 							? "btn-primary" : "btn-outline-primary")"
 							@onclick="() => SelectPlayerType(PlayerType.X)"> Jugador X
 					</button>
 
 					@*Jugador O*@
-					<button class="btn @(playerTypeSelection == PlayerType.O
+					<button class="btn @(playerTypeService.playerTypeSelection == PlayerType.O
 							? "btn-info" : "btn-outline-info")"
 							@onclick="() => SelectPlayerType(PlayerType.O)"> Jugador O
 					</button>
@@ -26,7 +29,7 @@
 
 				@*Boton Iniciar Partida*@
 				<button class="btn btn-success btn-lg mt-4"
-						disabled="@(playerTypeSelection == null)"
+						disabled="@(playerTypeService.playerTypeSelection == null)"
 						@onclick="StartGame"> Iniciar Partida
 				</button>
 
@@ -36,27 +39,16 @@
 </div>
 
 @code {
-	private enum PlayerType {X, O}
-
-	private bool gameStarted;
-	private PlayerType? playerTypeSelection;
-
 	private void SelectPlayerType(PlayerType playerType)
 	{
-		playerTypeSelection = playerType;
-		StateHasChanged();
-	}
-
-	private void SelectPlayerX()
-	{
-		playerTypeSelection = PlayerType.X;
+		playerTypeService.playerTypeSelection = playerType;
 	}
 
 	private void StartGame()
 	{
-		if (playerTypeSelection.HasValue)
+		if (playerTypeService.playerTypeSelection.HasValue)
 		{
-			gameStarted = true;
+			playerTypeService.gameStarted = true;
 		}
 	}
 }

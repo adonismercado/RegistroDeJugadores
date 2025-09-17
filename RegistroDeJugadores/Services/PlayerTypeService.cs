@@ -6,7 +6,7 @@ namespace RegistroDeJugadores.Services
     {
         public bool gameStarted { get; set; }
         public PlayerType? playerTypeSelection { get; set; }
-        public PlayerType _currentPlayerType { get; set; } = PlayerType.X;
+        public PlayerType? _currentPlayerType { get; set; } = PlayerType.X;
         public PlayerType? winner { get; set; }
         public bool esEmpate { get; set; }
         public PlayerType?[] board { get; set; } = new PlayerType?[9];
