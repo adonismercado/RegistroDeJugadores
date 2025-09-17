@@ -19,7 +19,8 @@ public class Partidas
     public int? GanadorId { get; set; }
     [Required(ErrorMessage = "TurnoJugadorID es obligatorio")]
     public int? TurnoJugadorId { get; set; }
-
+    [StringLength(9)]
+    public string EstadoTablero { get; set; }
     public DateTime FechaInicio { get; set; } = DateTime.UtcNow;
     public DateTime? FechaFin { get; set; }
 
