@@ -1,4 +1,6 @@
 ﻿@page "/game"
+
+@inject PlayerTypeService playerTypeService
 @rendermode InteractiveServer
 
 <PageTitle>Board TicTacToe</PageTitle>
@@ -11,10 +13,10 @@
 		{
 			var cellIndex = i; // Copia local para evitar problemas con el closure desde el lamda
 
-			<button class="cell @GetPlayerClass(board[cellIndex])"
+			<button class="cell @GetPlayerClass(playerTypeService.board[cellIndex])"
 					@onclick="() => HandleCellClick(cellIndex)"
-					disabled="@(board[cellIndex] != null || winner != null || esEmpate)">
-				@board[cellIndex]?.ToString()
+					disabled="@(playerTypeService.board[cellIndex] != null || playerTypeService.winner != null || playerTypeService.esEmpate)">
+				@playerTypeService.board[cellIndex]?.ToString()
 			</button>
 		}
 	</div>
@@ -26,49 +28,43 @@
 </div> 
 
 @code {
-	private enum PlayerType {X,O}
-	private PlayerType? winner;
-	private bool esEmpate;
-	private PlayerType _currentPlayerType = PlayerType.X;
-	private PlayerType?[] board = new PlayerType?[9];
-
 	private string GameStatus
 	{
 		get
 		{
-			if (winner != null) return $"🏆 ¡Ganador: {winner}!";
+			if (playerTypeService.winner != null) return $"🏆 ¡Ganador: {playerTypeService.winner}!";
 
-			return esEmpate
+			return playerTypeService.esEmpate
 				? "🤝 ¡Es un empate!"
-				: $"Turno de: {_currentPlayerType}";
+				: $"Turno de: {playerTypeService._currentPlayerType}";
 		}
 	}
 
 	private void HandleCellClick(int index)
 	{
 		// Ignorar si la celda esta ocupada o el juego termino.
-		if (board[index] != null || winner != null || esEmpate)
+		if (playerTypeService.board[index] != null || playerTypeService.winner != null || playerTypeService.esEmpate)
 		{
 			return;
 		}
 
-		board[index] = _currentPlayerType;
+		playerTypeService.board[index] = playerTypeService._currentPlayerType;
 
-		winner = CheckForWinner();
-		if (winner != null)
+		playerTypeService.winner = CheckForWinner();
+		if (playerTypeService.winner != null)
 		{
 			return; // La partida finaliza.
 		}
 
 		// Comprobar empate.
-		esEmpate = board.All(cell => cell != null);
-		if (esEmpate)
+		playerTypeService.esEmpate = playerTypeService.board.All(cell => cell != null);
+		if (playerTypeService.esEmpate)
 		{
 			return; // La partida termina.
 		}
 
 		// Cambiar turno.
-		_currentPlayerType = (_currentPlayerType == PlayerType.X)
+		playerTypeService._currentPlayerType = (playerTypeService._currentPlayerType == PlayerType.X)
 			? PlayerType.O
 			: PlayerType.X;
 	}
@@ -85,9 +81,9 @@
 		foreach (var line in winningLines)
 		{
 			var (a, b, c) = (line[0], line[1], line[2]);
-			if (board[a].HasValue && board[a] == board[b] && board[a] == board[c])
+			if (playerTypeService.board[a].HasValue && playerTypeService.board[a] == playerTypeService.board[b] && playerTypeService.board[a] == playerTypeService.board[c])
 			{
-				return board[a];
+				return playerTypeService.board[a];
 			}
 		}
 
@@ -96,12 +92,7 @@
 
 	private void RestartGame()
 	{
-		gameStarted = false;
-		playerTypeSelection = null;
-		board = new PlayerType?[9];
-		_currentPlayerType = PlayerType.X;
-		winner = null;
-		esEmpate = false;
+		playerTypeService.Reset();
 	}
 
 	private string GetPlayerClass(PlayerType? player)

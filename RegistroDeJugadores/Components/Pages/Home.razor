@@ -49,6 +49,7 @@
 		if (playerTypeService.playerTypeSelection.HasValue)
 		{
 			playerTypeService.gameStarted = true;
+			navigationManager.NavigateTo("/game");
 		}
 	}
 }
