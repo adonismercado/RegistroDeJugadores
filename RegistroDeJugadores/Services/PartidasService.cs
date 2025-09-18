@@ -38,6 +38,11 @@ public class PartidasService(IDbContextFactory<Contexto> DbFactory)
     public async Task<bool> Eliminar(int partidaId)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
+        // Eliiminar movimientos de la partida a eliminar antes de eliminar partida.
+        await contexto.Movimientos
+            .Where(m => m.PartidaId == partidaId)
+            .ExecuteDeleteAsync();
+
         return await contexto.Partidas
             .AsNoTracking()
             .Where(p => p.PartidaId == partidaId)
