@@ -3,6 +3,7 @@
 @inject PlayerTypeService playerTypeService
 @inject JugadoresService jugadoresService
 @inject PartidasService partidasService
+@inject MovimientosService movimientosService
 @rendermode InteractiveServer
 
 <PageTitle>Board TicTacToe</PageTitle>
@@ -73,6 +74,12 @@
 		}
 
 		playerTypeService.board[index] = playerTypeService._currentPlayerType;
+
+		int jugadorId = playerTypeService._currentPlayerType == PlayerType.X
+			? playerTypeService.Jugador1Id.Value
+			: playerTypeService.Jugador2Id.Value;
+
+		await RegistrarMovimiento(index / 3, index % 3, jugadorId);
 
 		playerTypeService.winner = CheckForWinner();
 		if (playerTypeService.winner != null)
@@ -145,6 +152,31 @@
 			await jugadoresService.Modificar(jugador2);
 		}
 	}
+
+	private async Task RegistrarMovimiento(int fila, int columna, int jugadorId)
+	{
+		if (!playerTypeService.PartidaId.HasValue)
+		{
+			return;
+		}
+
+		var movimiento = new Movimientos
+		{
+			PartidaId = playerTypeService.PartidaId.Value,
+			JugadorId = jugadorId,
+			PosicionFila = fila,
+			PosicionColumna = columna
+		};
+
+		await movimientosService.Guardar(movimiento);
+
+		var jugador = jugadorId == playerTypeService.Jugador1Id
+			? ListaJugadores.FirstOrDefault(j => j.JugadorId == jugadorId)
+			: ListaJugadores.FirstOrDefault(j => j.JugadorId == jugadorId);
+
+		jugador?.Movimientos.Add(movimiento);
+	}
+
 	private PlayerType? CheckForWinner()
 	{
 		var winningLines = new[]
