@@ -13,7 +13,7 @@ namespace RegistroDeJugadores.Services
 
         public int? Jugador1Id { get; set; }
         public int? Jugador2Id { get; set; }
-
+        public int? PartidaId { get; set; }
         public void Reset()
         {
             gameStarted = false;

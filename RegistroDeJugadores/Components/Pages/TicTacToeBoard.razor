@@ -2,6 +2,7 @@
 
 @inject PlayerTypeService playerTypeService
 @inject JugadoresService jugadoresService
+@inject PartidasService partidasService
 @rendermode InteractiveServer
 
 <PageTitle>Board TicTacToe</PageTitle>
@@ -63,7 +64,7 @@
 		}
 	}
 
-	private void HandleCellClick(int index)
+	private async Task HandleCellClick(int index)
 	{
 		// Ignorar si la celda esta ocupada o el juego termino.
 		if (playerTypeService.board[index] != null || playerTypeService.winner != null || playerTypeService.esEmpate)
@@ -76,6 +77,7 @@
 		playerTypeService.winner = CheckForWinner();
 		if (playerTypeService.winner != null)
 		{
+			await ActualizarPartida();
 			return; // La partida finaliza.
 		}
 
@@ -83,6 +85,7 @@
 		playerTypeService.esEmpate = playerTypeService.board.All(cell => cell != null);
 		if (playerTypeService.esEmpate)
 		{
+			await ActualizarPartida();
 			return; // La partida termina.
 		}
 
@@ -90,6 +93,32 @@
 		playerTypeService._currentPlayerType = (playerTypeService._currentPlayerType == PlayerType.X)
 			? PlayerType.O
 			: PlayerType.X;
+	}
+
+	private async Task ActualizarPartida()
+	{
+		if (!playerTypeService.PartidaId.HasValue)
+		{
+			return;
+		}
+
+		var partida = await partidasService.Buscar(playerTypeService.PartidaId.Value);
+		if (partida == null)
+		{
+			return;
+		}
+
+		partida.EstadoPartida = playerTypeService.winner != null
+				? "Finalizada"
+				: "Empate";
+		partida.GanadorId = playerTypeService.winner == PlayerType.X
+				? playerTypeService.Jugador1Id
+				: playerTypeService.Jugador2Id;
+		partida.TurnoJugadorId = playerTypeService.Jugador1Id;
+		partida.EstadoTablero = string.Concat(playerTypeService.board.Select(c => c?.ToString() ?? "-"));
+		partida.FechaFin = DateTime.UtcNow;
+
+		await partidasService.Guardar(partida);
 	}
 
 	private PlayerType? CheckForWinner()
