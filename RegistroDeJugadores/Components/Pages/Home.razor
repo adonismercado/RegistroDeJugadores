@@ -43,7 +43,7 @@
 
 				@*Boton Iniciar Partida*@
 				<button class="btn btn-success btn-lg mt-4"
-						disabled="@(playerTypeService.Jugador1Id == null || playerTypeService.Jugador2Id == null)"
+						disabled="@(playerTypeService.Jugador1Id == null)"
 						@onclick="StartGame">
 					Iniciar Partida
 				</button>
@@ -67,7 +67,7 @@
 
 	private async Task StartGame()
 	{
-		if (playerTypeService.Jugador1Id.HasValue && playerTypeService.Jugador2Id.HasValue)
+		if (playerTypeService.Jugador1Id.HasValue)
 		{
 			var nuevaPartida = new Partidas
 			{
@@ -84,7 +84,6 @@
 			if (guardada)
 			{
 				playerTypeService.PartidaId = nuevaPartida.PartidaId;
-
 				playerTypeService.gameStarted = true;
 				navigationManager.NavigateTo("/board");
 			}
