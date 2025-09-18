@@ -1,44 +1,64 @@
 ﻿@page "/"
 
 @inject PlayerTypeService playerTypeService
+@inject JugadoresService jugadoresService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
-<div class="container mx-auto max-w-lg display-6 bg-white rounded-lg shadow-xl text-center">
+
+<div class="container mx-auto max-w-lg bg-white rounded-lg shadow-xl text-center">
 	<div class="game-container">
 		@if (!playerTypeService.gameStarted)
 		{
 			<!-- Pantalla de Seleccion del Jugador -->
 			<div class="selection-screen">
 				<h1>Elige los jugadores</h1>
+					<div class="mb-3">
+						<label><strong>Jugador X</strong></label>
+						<InputSelect class="form-select" @bind-Value="playerTypeService.Jugador1Id" @onchange="e => SelectPlayerType(PlayerType.X)">
+							<option value="">-- Seleccione un Jugador --</option>
+							@foreach (var jugador in listaJugadores)
+							{
+								<option value="@jugador.JugadorId" disabled="@(jugador.JugadorId == playerTypeService.Jugador2Id)">
+									@jugador.Nombre
+								</option>
+							}
+						</InputSelect>
+					</div>
 
-				<div class="player-buttons">
-					@*Jugador X*@
-					<button class="btn @(playerTypeService.playerTypeSelection == PlayerType.X
-							? "btn-primary" : "btn-outline-primary")"
-							@onclick="() => SelectPlayerType(PlayerType.X)"> Jugador X
-					</button>
+					<div class="mb-3">
+						<label><strong>Jugador Y</strong></label>
+						<InputSelect class="form-select" @bind-Value="playerTypeService.Jugador2Id" @onchange="e => SelectPlayerType(PlayerType.O)">
+							<option value="">-- Seleccione un Jugador --</option>
+							@foreach (var jugador in listaJugadores)
+							{
+								<option value="@jugador.JugadorId" disabled="@(jugador.JugadorId == playerTypeService.Jugador1Id)">
+									@jugador.Nombre
+								</option>
+							}
+						</InputSelect>
+					</div>
 
-					@*Jugador O*@
-					<button class="btn @(playerTypeService.playerTypeSelection == PlayerType.O
-							? "btn-info" : "btn-outline-info")"
-							@onclick="() => SelectPlayerType(PlayerType.O)"> Jugador O
+					@*Boton Iniciar Partida*@
+					<button class="btn btn-success btn-lg mt-4"
+							disabled="@(playerTypeService.Jugador1Id == null || playerTypeService.Jugador2Id == null)"
+							@onclick="StartGame">
+						Iniciar Partida
 					</button>
 				</div>
-
-				@*Boton Iniciar Partida*@
-				<button class="btn btn-success btn-lg mt-4"
-						disabled="@(playerTypeService.playerTypeSelection == null)"
-						@onclick="StartGame"> Iniciar Partida
-				</button>
-
-			</div>
 		}
 	</div>
 </div>
 
 @code {
+	private List<Jugadores> listaJugadores = new List<Jugadores>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		listaJugadores = await jugadoresService.GetList(j => j.JugadorId > 0);
+	}
+
 	private void SelectPlayerType(PlayerType playerType)
 	{
 		playerTypeService.playerTypeSelection = playerType;
@@ -46,11 +66,10 @@
 
 	private void StartGame()
 	{
-		if (playerTypeService.playerTypeSelection.HasValue)
+		if (playerTypeService.Jugador1Id.HasValue && playerTypeService.Jugador2Id.HasValue)
 		{
 			playerTypeService.gameStarted = true;
 			navigationManager.NavigateTo("/game");
 		}
 	}
 }
- 

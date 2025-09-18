@@ -11,6 +11,9 @@ namespace RegistroDeJugadores.Services
         public bool esEmpate { get; set; }
         public PlayerType?[] board { get; set; } = new PlayerType?[9];
 
+        public int? Jugador1Id { get; set; }
+        public int? Jugador2Id { get; set; }
+
         public void Reset()
         {
             gameStarted = false;
