@@ -77,7 +77,7 @@
 		playerTypeService.winner = CheckForWinner();
 		if (playerTypeService.winner != null)
 		{
-			await ActualizarPartida();
+			await ActualizarEstadisticas();
 			return; // La partida finaliza.
 		}
 
@@ -85,7 +85,7 @@
 		playerTypeService.esEmpate = playerTypeService.board.All(cell => cell != null);
 		if (playerTypeService.esEmpate)
 		{
-			await ActualizarPartida();
+			await ActualizarEstadisticas();
 			return; // La partida termina.
 		}
 
@@ -95,7 +95,7 @@
 			: PlayerType.X;
 	}
 
-	private async Task ActualizarPartida()
+	private async Task ActualizarEstadisticas()
 	{
 		if (!playerTypeService.PartidaId.HasValue)
 		{
@@ -119,8 +119,32 @@
 		partida.FechaFin = DateTime.UtcNow;
 
 		await partidasService.Guardar(partida);
-	}
 
+		var jugador1 = await jugadoresService.Buscar(partida.Jugador1Id.Value);
+		var jugador2 = await jugadoresService.Buscar(partida.Jugador2Id.Value);
+
+		if (jugador1 != null && jugador2 != null)
+		{
+			if (partida.EstadoPartida == "Empate")
+			{
+				jugador1.Empates += 1;
+				jugador2.Empates += 1;
+			}
+			else if (partida.GanadorId == jugador1.JugadorId)
+			{
+				jugador1.Victorias += 1;
+				jugador2.Derrotas += 1;
+			}
+			else if (partida.GanadorId == jugador2.JugadorId)
+			{
+				jugador1.Derrotas += 1;
+				jugador2.Victorias += 1;
+			}
+
+			await jugadoresService.Modificar(jugador1);
+			await jugadoresService.Modificar(jugador2);
+		}
+	}
 	private PlayerType? CheckForWinner()
 	{
 		var winningLines = new[]
@@ -142,9 +166,32 @@
 		return null;
 	}
 
-	private void RestartGame()
+	private async Task RestartGame()
 	{
 		playerTypeService.Reset();
+
+		var nuevaPartida = new Partidas
+		{
+			Jugador1Id = playerTypeService.Jugador1Id,
+			Jugador2Id = playerTypeService.Jugador2Id,
+			TurnoJugadorId = playerTypeService.Jugador1Id,
+			EstadoPartida = "En Progreso",
+			EstadoTablero = "---------",
+			FechaInicio = DateTime.UtcNow
+		};
+
+		bool guardada = await partidasService.Guardar(nuevaPartida);
+
+		if (guardada)
+		{
+			playerTypeService.PartidaId = nuevaPartida.PartidaId;
+
+			playerTypeService.gameStarted = true;
+		}
+		else
+		{
+			Console.WriteLine("Error al crear partida en la base de datos.");
+		}
 	}
 
 	private string GetPlayerClass(PlayerType? player)
