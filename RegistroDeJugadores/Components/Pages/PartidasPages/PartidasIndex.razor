@@ -51,43 +51,44 @@
 					</div>
 				</div>
 			</div>
-
-			<table class="table table-hover table-striped table-bordered align-middle text-center mt-3">
-				<thead class="table table-striped text-black">
-					<tr>
-						<th>ID</th>
-						<th>JUGADOR 1</th>
-						<th>JUGADOR 2</th>
-						<th>ESTADO PARTIDA</th>
-						<th>GANADOR</th>
-						<th>TURNO JUGADOR</th>
-						<th>ESTADO TABLERO</th>
-						<th>FECHA INICIO</th>
-						<th>FECHA FIN</th>
-						<th>OPCIONES</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var partida in ListaPartidas)
-					{
+			<div class="table-responsive">
+				<table class="table table-hover table-striped table-bordered align-middle text-center mt-3">
+					<thead class="table table-striped text-black">
 						<tr>
-							<td>@partida.PartidaId</td>
-							<td>@partida.Jugador1?.Nombre</td>
-							<td>@partida.Jugador2?.Nombre</td>
-							<td>@partida.EstadoPartida</td>
-							<td>@partida.Ganador?.Nombre</td>
-							<td>@partida.TurnoJugador?.Nombre</td>
-							<td>@partida.EstadoTablero</td>
-							<td>@partida.FechaInicio.ToString("dd/MM/yyyy")</td>
-							<td>@partida.FechaFin?.ToString("dd/MM/yyyy")</td>
-
-							<td class="text-center">
-								<a href="/Partida/Edit/@partida.PartidaId" class="btn btn-outline-primary bi bi-pencil"></a>
-							</td>
+							<th>ID</th>
+							<th>JUGADOR 1</th>
+							<th>JUGADOR 2</th>
+							<th>ESTADO PARTIDA</th>
+							<th>GANADOR</th>
+							<th>TURNO JUGADOR</th>
+							<th>ESTADO TABLERO</th>
+							<th>FECHA INICIO</th>
+							<th>FECHA FIN</th>
+							<th>OPCIONES</th>
 						</tr>
-					}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						@foreach (var partida in ListaPartidas)
+						{
+							<tr>
+								<td>@partida.PartidaId</td>
+								<td>@partida.Jugador1?.Nombre</td>
+								<td>@partida.Jugador2?.Nombre</td>
+								<td>@partida.EstadoPartida</td>
+								<td>@partida.Ganador?.Nombre</td>
+								<td>@partida.TurnoJugador?.Nombre</td>
+								<td>@partida.EstadoTablero</td>
+								<td>@partida.FechaInicio.ToString("dd/MM/yyyy")</td>
+								<td>@partida.FechaFin?.ToString("dd/MM/yyyy")</td>
+
+								<td class="text-center">
+									<a href="/Partida/Edit/@partida.PartidaId" class="btn btn-outline-primary bi bi-pencil"></a>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
 		</div>
 		<div class="card-footer space-between">
 			<label>Cantidad: @ListaPartidas.Count()</label>
