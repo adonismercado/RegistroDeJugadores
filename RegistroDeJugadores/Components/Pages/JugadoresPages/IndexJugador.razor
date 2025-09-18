@@ -26,20 +26,23 @@
 				</div>
 			</div>
 
+			@*Inputs y Botones*@
 			<div class="row align-items-center mb-4">
 				<div class="col-3">
 					<InputSelect class="form-select" @bind-value="Filtro">
 						<option value="" selected disabled>Elija una opcion</option>
 						<option value="JugadorId">JugadorId</option>
 						<option value="Nombre">Nombre</option>
-						<option value="Partidas">Partidas</option>
+						<option value="Victorias">Victorias</option>
+						<option value="Derrotas">Derrotas</option>
+						<option value="Empates">Empates</option>
 					</InputSelect>
 				</div>
 
 				<div class="col-4">
 					<div class="input-group">
 						<input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
-						<button type="button" class="btn btn-primary bi bi-search" @onclick="Buscar"> Buscar</button>
+						<button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
 					</div>
 				</div>
 			</div>
@@ -47,9 +50,11 @@
 			<table class="table table-hover table-striped table-bordered align-middle text-center">
 				<thead class="table table-striped text-black">
 					<tr>
-						<th>JUGADOR ID</th>
+						<th>ID</th>
 						<th>NOMBRE</th>
-						<th>PARTIDAS</th>
+						<th>VICTORIAS</th>
+						<th>DERROTAS</th>
+						<th>EMPATES</th>
 						<th>OPCIONES</th>
 					</tr>
 				</thead>
@@ -60,6 +65,8 @@
 							<td>@jugador.JugadorId</td>
 							<td>@jugador.Nombre</td>
 							<td>@jugador.Victorias</td>
+							<td>@jugador.Derrotas</td>
+							<td>@jugador.Empates</td>
 							<td>
 								<a href="/Jugador/Edit/@jugador.JugadorId" class="btn btn-outline-primary btn-sm align-items-center">
 									<span class="bi bi-pencil"></span>
@@ -96,9 +103,17 @@
 			{
 				ListaJugadores = await jugadoresService.GetList(j => j.Nombre.Contains(ValorFiltro));
 			}
-			else if (Filtro == "Partidas" && int.TryParse(ValorFiltro, out var partidas))
+			else if (Filtro == "Victorias" && int.TryParse(ValorFiltro, out var victorias))
 			{
-				ListaJugadores = await jugadoresService.GetList(j => j.Victorias == partidas);
+				ListaJugadores = await jugadoresService.GetList(j => j.Victorias == victorias);
+			}
+			else if (Filtro == "Derrotas" && int.TryParse(ValorFiltro, out var derrotas))
+			{
+				ListaJugadores = await jugadoresService.GetList(j => j.Derrotas == derrotas);
+			}
+			else if (Filtro == "Empates" && int.TryParse(ValorFiltro, out var empates))
+			{
+				ListaJugadores = await jugadoresService.GetList(j => j.Empates == empates);
 			}
 		}
 		else
