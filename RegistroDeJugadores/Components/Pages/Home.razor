@@ -17,7 +17,7 @@
 				<h1>Elige los jugadores</h1>
 				<div class="mb-3">
 					<label><strong>Jugador X</strong></label>
-					<InputSelect class="form-select" @bind-Value="playerTypeService.Jugador1Id" @onchange="e => SelectPlayerType(PlayerType.X)">
+					<InputSelect class="form-select mt-2" @bind-Value="playerTypeService.Jugador1Id" @onchange="e => SelectPlayerType(PlayerType.X)">
 						<option value="">-- Seleccione un Jugador --</option>
 						@foreach (var jugador in listaJugadores)
 						{
@@ -29,8 +29,8 @@
 				</div>
 
 				<div class="mb-3">
-					<label><strong>Jugador Y</strong></label>
-					<InputSelect class="form-select" @bind-Value="playerTypeService.Jugador2Id" @onchange="e => SelectPlayerType(PlayerType.O)">
+					<label><strong>Jugador O</strong></label>
+					<InputSelect class="form-select mt-2" @bind-Value="playerTypeService.Jugador2Id" @onchange="e => SelectPlayerType(PlayerType.O)">
 						<option value="">-- Seleccione un Jugador --</option>
 						@foreach (var jugador in listaJugadores)
 						{
