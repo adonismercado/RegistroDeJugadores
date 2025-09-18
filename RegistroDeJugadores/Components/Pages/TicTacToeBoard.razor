@@ -1,6 +1,7 @@
 ﻿@page "/game"
 
 @inject PlayerTypeService playerTypeService
+@inject JugadoresService jugadoresService
 @rendermode InteractiveServer
 
 <PageTitle>Board TicTacToe</PageTitle>
@@ -22,20 +23,43 @@
 	</div>
 
 	<button class="btn btn-secondary mt-4"
-			@onclick="RestartGame"> Reiniciar Juego
+			@onclick="RestartGame">
+		Reiniciar Juego
 	</button>
-</div> 
+</div>
 
 @code {
+	public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		ListaJugadores = await jugadoresService.GetList(j => j.JugadorId > 0);
+	}
+
 	private string GameStatus
 	{
 		get
 		{
-			if (playerTypeService.winner != null) return $"🏆 ¡Ganador: {playerTypeService.winner}!";
+			if (playerTypeService.winner != null)
+			{
+				string nombreGanador = playerTypeService.winner == PlayerType.X
+						? ListaJugadores.FirstOrDefault(j => j.JugadorId == playerTypeService.Jugador1Id)?.Nombre ?? "Jugador X"
+						: ListaJugadores.FirstOrDefault(j => j.JugadorId == playerTypeService.Jugador2Id)?.Nombre ?? "Jugador O";
 
-			return playerTypeService.esEmpate
-				? "🤝 ¡Es un empate!"
-				: $"Turno de: {playerTypeService._currentPlayerType}";
+				return $"🏆 ¡Ganador: {nombreGanador}!";
+			}
+
+			if (playerTypeService.esEmpate)
+			{
+				return "🤝 ¡Es un empate!";
+			}
+
+			string nombreTurno = playerTypeService._currentPlayerType == PlayerType.X
+					? ListaJugadores.FirstOrDefault(j => j.JugadorId == playerTypeService.Jugador1Id)?.Nombre ?? "Jugador X"
+					: ListaJugadores.FirstOrDefault(j => j.JugadorId == playerTypeService.Jugador2Id)?.Nombre ?? "Jugador O";
+
+			return $"Turno de: {nombreTurno}";
+
 		}
 	}
 
