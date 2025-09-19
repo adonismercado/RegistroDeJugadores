@@ -9,21 +9,25 @@
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            <NavLink class="nav-link d-flex align-items-center" href="/" Match="NavLinkMatch.All">
+                <i class="bi bi-controller me-3 d-flex" style="font-size: 1.5rem; align-items: center; justify-content: center;"></i>
+                <span><strong>Juego</strong></span>
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/Jugador/Index">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Jugadores
+            <NavLink class="nav-link d-flex align-items-center" href="/Jugador/Index" Match="NavLinkMatch.All">
+                <i class="bi bi-people-fill me-3 d-flex" style="font-size: 1.5rem; align-items: center; justify-content: center;"></i>
+                <span><strong> Jugadores</strong></span>
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/Partida/Index">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Partidas
+            <NavLink class="nav-link d-flex align-items-center" href="/Partida/Index" Match="NavLinkMatch.All">
+                <i class="bi bi-card-checklist me-3 d-flex" style="font-size: 1.5rem; align-items: center; justify-content: center;"></i>
+                <span><strong>  Partidas</strong></span>
             </NavLink>
         </div>
+
     </nav>
 </div>

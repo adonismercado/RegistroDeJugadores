@@ -37,6 +37,7 @@
 						<option value="EstadoPartida">EstadoPartida</option>
 						<option value="GanadorId">GanadorId</option>
 						<option value="TurnoJugadorId">TurnoJugadorId</option>
+						<option value="EstadoTablero">EstadoTablero</option>
 						<option value="FechaInicio">FechaInicio</option>
 						<option value="FechaFin">FechaFin</option>
 					</InputSelect>
@@ -50,41 +51,44 @@
 					</div>
 				</div>
 			</div>
-
-			<table class="table table-hover table-striped table-bordered align-middle text-center mt-3">
-				<thead class="table table-striped text-black">
-					<tr>
-						<th>Partida ID</th>
-						<th>Jugador 1 ID</th>
-						<th>Jugador 2 ID</th>
-						<th>Estado Partida</th>
-						<th>Ganador ID</th>
-						<th>Turno Jugador ID</th>
-						<th>Fecha Inicio</th>
-						<th>Fecha Fin</th>
-						<th>Opciones</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var partida in ListaPartidas)
-					{
+			<div class="table-responsive">
+				<table class="table table-hover table-striped table-bordered align-middle text-center mt-3">
+					<thead class="table table-striped text-black">
 						<tr>
-							<td>@partida.PartidaId</td>
-							<td>@partida.Jugador1?.Nombre</td>
-							<td>@partida.Jugador2?.Nombre</td>
-							<td>@partida.EstadoPartida</td>
-							<td>@partida.Ganador?.Nombre</td>
-							<td>@partida.TurnoJugador?.Nombre</td>
-							<td>@partida.FechaInicio.ToString("dd/MM/yyyy")</td>
-							<td>@partida.FechaFin?.ToString("dd/MM/yyyy")</td>
-
-							<td class="text-center">
-								<a href="/Partida/Edit/@partida.PartidaId" class="btn btn-outline-primary bi bi-pencil-square"></a>
-							</td>
+							<th>ID</th>
+							<th>JUGADOR 1</th>
+							<th>JUGADOR 2</th>
+							<th>ESTADO PARTIDA</th>
+							<th>GANADOR</th>
+							<th>TURNO JUGADOR</th>
+							<th>ESTADO TABLERO</th>
+							<th>FECHA INICIO</th>
+							<th>FECHA FIN</th>
+							<th>OPCIONES</th>
 						</tr>
-					}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						@foreach (var partida in ListaPartidas)
+						{
+							<tr>
+								<td>@partida.PartidaId</td>
+								<td>@partida.Jugador1?.Nombre</td>
+								<td>@partida.Jugador2?.Nombre</td>
+								<td>@partida.EstadoPartida</td>
+								<td>@partida.Ganador?.Nombre</td>
+								<td>@partida.TurnoJugador?.Nombre</td>
+								<td>@partida.EstadoTablero</td>
+								<td>@partida.FechaInicio.ToString("dd/MM/yyyy")</td>
+								<td>@partida.FechaFin?.ToString("dd/MM/yyyy")</td>
+
+								<td class="text-center">
+									<a href="/Partida/Edit/@partida.PartidaId" class="btn btn-outline-primary bi bi-pencil"></a>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
 		</div>
 		<div class="card-footer space-between">
 			<label>Cantidad: @ListaPartidas.Count()</label>
@@ -130,6 +134,10 @@
 			if (Filtro == "TurnoJugadorId" && int.TryParse(ValorFiltro, out var turnoJugadorId))
 			{
 				ListaPartidas = await partidasService.GetList(p => p.TurnoJugadorId == turnoJugadorId);
+			}
+			if (Filtro == "EstadoTablero")
+			{
+				ListaPartidas = await partidasService.GetList(p => p.EstadoTablero.ToLower().Contains(ValorFiltro));
 			}
 		}
 		else

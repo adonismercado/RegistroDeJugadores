@@ -1,0 +1,254 @@
+﻿@page "/board"
+
+@inject PlayerTypeService playerTypeService
+@inject JugadoresService jugadoresService
+@inject PartidasService partidasService
+@inject MovimientosService movimientosService
+@rendermode InteractiveServer
+
+<PageTitle>Board TicTacToe</PageTitle>
+<!-- Pantalla de Juego TicTacToe -->
+<div class="game-screen">
+	<h2 class="game-status">@GameStatus</h2>
+
+	<div class="game-board">
+		@for (var i = 0; i < 9; i++)
+		{
+			var cellIndex = i; // Copia local para evitar problemas con el closure desde el lamda
+
+			<button class="cell @GetPlayerClass(playerTypeService.board[cellIndex])"
+					@onclick="() => HandleCellClick(cellIndex)"
+					disabled="@(playerTypeService.board[cellIndex] != null || playerTypeService.winner != null || playerTypeService.esEmpate)">
+				@playerTypeService.board[cellIndex]?.ToString()
+			</button>
+		}
+	</div>
+
+	<div class="d-flex justify-content-center mt-4">
+		<button class="btn btn-secondary"
+				@onclick="RestartGame">
+			Reiniciar Juego
+		</button>
+	</div>
+</div>
+
+@code {
+	public List<Jugadores> ListaJugadores { get; set; } = new List<Jugadores>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		ListaJugadores = await jugadoresService.GetList(j => j.JugadorId > 0);
+	}
+
+	private string GameStatus
+	{
+		get
+		{
+			if (playerTypeService.winner != null)
+			{
+				string nombreGanador = playerTypeService.winner == PlayerType.X
+						? ListaJugadores.FirstOrDefault(j => j.JugadorId == playerTypeService.Jugador1Id)?.Nombre ?? "Jugador X"
+						: ListaJugadores.FirstOrDefault(j => j.JugadorId == playerTypeService.Jugador2Id)?.Nombre ?? "Jugador O";
+
+				return $"🏆 ¡Ganador: {nombreGanador}!";
+			}
+
+			if (playerTypeService.esEmpate)
+			{
+				return "🤝 ¡Es un empate!";
+			}
+
+			string nombreTurno = playerTypeService._currentPlayerType == PlayerType.X
+					? ListaJugadores.FirstOrDefault(j => j.JugadorId == playerTypeService.Jugador1Id)?.Nombre ?? "Jugador X"
+					: (playerTypeService.Jugador2Id.HasValue
+						? ListaJugadores.FirstOrDefault(j => j.JugadorId == playerTypeService.Jugador2Id)?.Nombre ?? "Jugador O"
+						: "Jugador O");
+
+			return $"Turno de: {nombreTurno}";
+
+		}
+	}
+
+	private async Task HandleCellClick(int index)
+	{
+		// Ignorar si la celda esta ocupada o el juego termino.
+		if (playerTypeService.board[index] != null || playerTypeService.winner != null || playerTypeService.esEmpate)
+		{
+			return;
+		}
+
+		playerTypeService.board[index] = playerTypeService._currentPlayerType;
+
+		int jugadorId = playerTypeService._currentPlayerType == PlayerType.X
+			? playerTypeService.Jugador1Id.Value
+			: playerTypeService.Jugador2Id ?? 0;
+
+		await RegistrarMovimiento(index / 3, index % 3, jugadorId);
+
+		playerTypeService.winner = CheckForWinner();
+		if (playerTypeService.winner != null)
+		{
+			await ActualizarEstadisticas();
+			return; // La partida finaliza.
+		}
+
+		// Comprobar empate.
+		playerTypeService.esEmpate = playerTypeService.board.All(cell => cell != null);
+		if (playerTypeService.esEmpate)
+		{
+			await ActualizarEstadisticas();
+			return; // La partida termina.
+		}
+
+		// Cambiar turno.
+		playerTypeService._currentPlayerType = (playerTypeService._currentPlayerType == PlayerType.X)
+			? PlayerType.O
+			: PlayerType.X;
+	}
+
+	private async Task ActualizarEstadisticas()
+	{
+		if (!playerTypeService.PartidaId.HasValue)
+		{
+			return;
+		}
+
+		var partida = await partidasService.Buscar(playerTypeService.PartidaId.Value);
+		if (partida == null)
+		{
+			return;
+		}
+
+		partida.EstadoPartida = playerTypeService.winner != null
+				? "Finalizada"
+				: "Empate";
+		partida.GanadorId = playerTypeService.winner == PlayerType.X
+				? playerTypeService.Jugador1Id
+				: playerTypeService.Jugador2Id;
+		partida.TurnoJugadorId = playerTypeService.Jugador1Id;
+		partida.EstadoTablero = string.Concat(playerTypeService.board.Select(c => c?.ToString() ?? "-"));
+		partida.FechaFin = DateTime.UtcNow;
+
+		await partidasService.Guardar(partida);
+
+		var jugador1 = await jugadoresService.Buscar(partida.Jugador1Id.Value);
+		var jugador2 = partida.Jugador2Id.HasValue
+					   ? await jugadoresService.Buscar(partida.Jugador2Id.Value)
+					   : null;
+
+		if (jugador1 != null)
+		{
+			if (jugador2 != null)
+			{
+				if (partida.EstadoPartida == "Empate")
+				{
+					jugador1.Empates += 1;
+					jugador2.Empates += 1;
+				}
+				else if (partida.GanadorId == jugador1.JugadorId)
+				{
+					jugador1.Victorias += 1;
+					jugador2.Derrotas += 1;
+				}
+				else if (partida.GanadorId == jugador2.JugadorId)
+				{
+					jugador1.Derrotas += 1;
+					jugador2.Victorias += 1;
+				}
+				await jugadoresService.Modificar(jugador2);
+			}
+
+			await jugadoresService.Modificar(jugador1);
+		}
+	}
+
+	private async Task RegistrarMovimiento(int fila, int columna, int jugadorId)
+	{
+		if (jugadorId == 0)
+		{
+			return;
+		}
+
+		if (!playerTypeService.PartidaId.HasValue)
+		{
+			return;
+		}
+
+		var movimiento = new Movimientos
+		{
+			PartidaId = playerTypeService.PartidaId.Value,
+			JugadorId = jugadorId,
+			PosicionFila = fila,
+			PosicionColumna = columna
+		};
+
+		await movimientosService.Guardar(movimiento);
+
+		var jugador = jugadorId == playerTypeService.Jugador1Id
+			? ListaJugadores.FirstOrDefault(j => j.JugadorId == jugadorId)
+			: ListaJugadores.FirstOrDefault(j => j.JugadorId == jugadorId);
+
+		jugador?.Movimientos.Add(movimiento);
+	}
+
+	private PlayerType? CheckForWinner()
+	{
+		var winningLines = new[]
+		{
+			new[] {0,1,2}, new[] {3,4,5}, new[] {6,7,8}, // Victorias Horizontales
+			new[] {0,3,6}, new[] {1,4,7}, new[] {2,5,8}, // Victorias Verticales
+			new[] {0,4,8}, new[] {2,4,6} // Victorias Diagonales
+		};
+
+		foreach (var line in winningLines)
+		{
+			var (a, b, c) = (line[0], line[1], line[2]);
+			if (playerTypeService.board[a].HasValue && playerTypeService.board[a] == playerTypeService.board[b] && playerTypeService.board[a] == playerTypeService.board[c])
+			{
+				return playerTypeService.board[a];
+			}
+		}
+
+		return null;
+	}
+
+	private async Task RestartGame()
+	{
+		playerTypeService.Reset();
+
+		var nuevaPartida = new Partidas
+		{
+			Jugador1Id = playerTypeService.Jugador1Id,
+			Jugador2Id = playerTypeService.Jugador2Id,
+			TurnoJugadorId = playerTypeService.Jugador1Id,
+			EstadoPartida = "En Progreso",
+			EstadoTablero = "---------",
+			FechaInicio = DateTime.UtcNow
+		};
+
+		bool guardada = await partidasService.Guardar(nuevaPartida);
+
+		if (guardada)
+		{
+			playerTypeService.PartidaId = nuevaPartida.PartidaId;
+
+			playerTypeService.gameStarted = true;
+		}
+		else
+		{
+			Console.WriteLine("Error al crear partida en la base de datos.");
+		}
+	}
+
+	private string GetPlayerClass(PlayerType? player)
+	{
+		if (!player.HasValue)
+		{
+			return "";
+		}
+		return player == PlayerType.X
+			? "player-x"
+			: "player-o";
+	}
+}
+

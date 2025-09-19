@@ -24,9 +24,21 @@
 			</div>
 
 			<div class="mb-3">
-				<label class="form-label"><strong>Partidas</strong></label>
+				<label class="form-label"><strong>Victorias</strong></label>
 				<InputNumber class="form-control" @bind-Value="Jugador.Victorias"></InputNumber>
 				<ValidationMessage For="(() => Jugador.Victorias)" />
+			</div>
+
+			<div class="mb-3">
+				<label class="form-label"><strong>Derrotas</strong></label>
+				<InputNumber class="form-control" @bind-Value="Jugador.Derrotas"></InputNumber>
+				<ValidationMessage For="(() => Jugador.Derrotas)" />
+			</div>
+
+			<div class="mb-3">
+				<label class="form-label"><strong>Empates</strong></label>
+				<InputNumber class="form-control" @bind-Value="Jugador.Empates"></InputNumber>
+				<ValidationMessage For="(() => Jugador.Empates)" />
 			</div>
 		</div>
 
