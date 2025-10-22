@@ -1,6 +1,6 @@
 ﻿namespace RegistroDeJugadores.Shared.Dtos;
 
-public record MovimientosResponse(
+public record MovimientosRequest(
     int PartidaId,
     string Jugador,
     int PosicionFila,
