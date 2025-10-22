@@ -20,18 +20,18 @@
 				<div class="player-buttons">
 					<div class="mb-3">
 						<label><strong>Jugador X</strong></label>
-						<input type="number" class="form-control" bind="Jugador1Id" placeholder="Jugador 1 ID" />
+						<input type="number" class="form-control" @bind="Jugador1Id" placeholder="Jugador 1 ID" />
 					</div>
 
 					<div class="mb-3">
 						<label><strong>Jugador O</strong></label>
-						<input type="number" class="form-control" bind="Jugador2Id" placeholder="Jugador 2 ID" />
+						<input type="number" class="form-control" @bind="Jugador2Id" placeholder="Jugador 2 ID" />
 					</div>
 				</div>
 
 				@*Boton Crear Partida*@
 				<button class="btn btn-success btn-lg mt-2"
-						disabled="@(Jugador1Id == 0)"
+						disabled="@(Jugador1Id == 0 || Jugador2Id == 0)"
 						@onclick="StartGame">
 					Crear Partida
 				</button>
@@ -80,7 +80,7 @@
 					}
 				</div>
 
-				<button class="btn btn-secondary" @onclick="LeaveGame">
+				<button class="btn btn-secondary mt-5" @onclick="LeaveGame">
 					Salir de la Partida
 				</button>
 			</div>
@@ -142,6 +142,7 @@
 		}
 
 		PartidaId = response.Data?.PartidaId ?? 0;
+		ResetGameState();
 		gameStarted = true;
 	}
 
@@ -235,5 +236,14 @@
 	private void HandlePartidaSelected(int partidaId)
 	{
 		PartidaId = partidaId;
+	}
+
+	private void ResetGameState()
+	{
+		board = new PlayerType?[9];   
+		_currentPlayerType = PlayerType.X;  
+		winner = null;
+		esEmpate = false;
+		errorMensaje = string.Empty;
 	}
 }
