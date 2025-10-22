@@ -1,7 +1,7 @@
 ﻿using RegistroDeJugadores.Shared;
 using RegistroDeJugadores.Shared.Dtos;
 
-namespace RegistroDeJugadores.BlazorWasm;
+namespace RegistroDeJugadores.Bla;
 public interface IPartidasApiService
 {
     Task<Resource<List<PartidaResponse>>> GetPartidasAsync();

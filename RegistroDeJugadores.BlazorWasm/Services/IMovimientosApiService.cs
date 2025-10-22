@@ -5,6 +5,6 @@ namespace RegistroDeJugadores.BlazorWasm.Services;
 
 public interface IMovimientosApiService
 {
-    Task<Resource<MovimientosResponse>> GetPartidasAsync(int partidaId);
-    Task<Resource<MovimientosResponse>> PostMovimientos(int partidaId, string jugador, int posicionFila, int posicionColumna);
+    Task<Resource<MovimientosResponse>> GetMovimientosAsync(int partidaId);
+    Task<Resource<bool>> PostMovimientos(int partidaId, string jugador, int posicionFila, int posicionColumna);
 }
