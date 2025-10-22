@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistroDeJugadores", "Regi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistroDeJugadores.BlazorWasm", "RegistroDeJugadores.BlazorWasm\RegistroDeJugadores.BlazorWasm.csproj", "{0721ADAE-4583-41E4-841E-4BA2877EDE05}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistroDeJugadores.Shared", "RegistroDeJugadores.Shared\RegistroDeJugadores.Shared.csproj", "{7C9FD876-9F8C-4C55-A558-0177C9BDA9D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{0721ADAE-4583-41E4-841E-4BA2877EDE05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0721ADAE-4583-41E4-841E-4BA2877EDE05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0721ADAE-4583-41E4-841E-4BA2877EDE05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C9FD876-9F8C-4C55-A558-0177C9BDA9D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C9FD876-9F8C-4C55-A558-0177C9BDA9D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C9FD876-9F8C-4C55-A558-0177C9BDA9D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C9FD876-9F8C-4C55-A558-0177C9BDA9D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
