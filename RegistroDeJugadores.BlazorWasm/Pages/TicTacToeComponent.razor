@@ -7,17 +7,26 @@
 	<div class="game-container">
 		@if (!gameStarted)
 		{
+			<div class="container-fluid py-5">
+				<h1 class="display-3 fw-bold">TicTacToe</h1>
+				<p class="fs-12">
+					Cada jugador solo debe colocar su símbolo una vez por turno y no debe ser sobre una casilla ya jugada.
+					En caso de que el jugador haga trampa el ganador será el otro. Se debe conseguir realizar una línea recta o diagonal por símbolo para ganar.
+				</p>
+			</div>
 			<!-- SELECCIONAR JUGADORES Y CREAR O UNIRSE A PARTIDA -->
 			<div class="selection-screen">
 				<h1>Elige los jugadores</h1>
-				<div class="mb-3">
-					<label><strong>Jugador X</strong></label>
-					<input type="number" class="form-control" bind="Jugador1Id" placeholder="Jugador 1 ID" />
-				</div>
+				<div class="player-buttons">
+					<div class="mb-3">
+						<label><strong>Jugador X</strong></label>
+						<input type="number" class="form-control" bind="Jugador1Id" placeholder="Jugador 1 ID" />
+					</div>
 
-				<div class="mb-3">
-					<label><strong>Jugador O</strong></label>
-					<input type="number" class="form-control" bind="Jugador2Id" placeholder="Jugador 2 ID" />
+					<div class="mb-3">
+						<label><strong>Jugador O</strong></label>
+						<input type="number" class="form-control" bind="Jugador2Id" placeholder="Jugador 2 ID" />
+					</div>
 				</div>
 
 				@*Boton Crear Partida*@
@@ -31,20 +40,18 @@
 
 				<h3>Unirse a Partida</h3>
 				<div class="form-group">
-					<label class="form-label">ID de la Partida</label>
+					<label for="partidaId"><strong>ID de la Partida:</strong></label>
 					<div class="input-group">
-						<input type="number" class="form-control" bind="PartidaId" placeholder="Partida ID" />
-
-						<button class="btn btn-outline-dark" type="button" @onclick="AbrirModalPartidas">
-							<span class="bi bi-search"></span>
+						<input id="partidaId" type="number" class="form-control " @bind="PartidaId" placeholder="ID de la partida" />
+						<button class="btn btn-outline-secondary" type="button" @onclick="AbrirModalPartidas">
+							<span class="bi-search-icon"></span>
 						</button>
 					</div>
 				</div>
-
-				<button class="btn btn-info"
+				<button class="btn btn-warning btn-lg mt-2"
 						disabled="@(PartidaId == 0)"
 						@onclick="JoinGame">
-					Unirse a la Partida
+					Unirse a Partida
 				</button>
 
 				@if (!string.IsNullOrWhiteSpace(errorMensaje))
