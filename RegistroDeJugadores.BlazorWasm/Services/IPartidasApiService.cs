@@ -1,6 +1,7 @@
 ﻿using RegistroDeJugadores.Shared;
 using RegistroDeJugadores.Shared.Dtos;
 
+namespace RegistroDeJugadores.Shared;
 public interface IPartidasApiService
 {
     Task<Resource<List<PartidaResponse>>> GetPartidasAsync();

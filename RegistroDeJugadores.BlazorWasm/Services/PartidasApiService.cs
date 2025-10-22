@@ -4,8 +4,6 @@ using RegistroDeJugadores.Shared.Dtos;
 
 namespace RegistroDeJugadores.BlazorWasm.Services;
 
-
-
 public class PartidasApiService(HttpClient httpClient) : IPartidasApiService
 {
     public async Task<Resource<List<PartidaResponse>>> GetPartidasAsync()
