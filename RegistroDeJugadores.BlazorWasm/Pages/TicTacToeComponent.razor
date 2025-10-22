@@ -30,13 +30,13 @@
 				</div>
 
 				@*Boton Crear Partida*@
-				<button class="btn btn-success btn-lg mt-4"
+				<button class="btn btn-success btn-lg mt-2"
 						disabled="@(Jugador1Id == 0)"
 						@onclick="StartGame">
 					Crear Partida
 				</button>
 
-				<hr />
+				<hr class="my-4"/>
 
 				<h3>Unirse a Partida</h3>
 				<div class="form-group">
@@ -48,7 +48,7 @@
 						</button>
 					</div>
 				</div>
-				<button class="btn btn-warning btn-lg mt-2"
+				<button class="btn btn-dark btn-lg mt-3"
 						disabled="@(PartidaId == 0)"
 						@onclick="JoinGame">
 					Unirse a Partida
@@ -87,6 +87,10 @@
 		}
 	</div>
 </div>
+
+<ModalPartidas EstaAbierto="mostrarModal"
+			   CambioEstaAbierto="(value) => mostrarModal = value"
+			   OnPartidaSelected="HandlePartidaSelected"/>
 
 @code {
 	public Guid CurrentSession { get; set; }
