@@ -1,5 +1,6 @@
 ﻿@page "/gameboard"
 @inject IPartidasApiService partidasApiService
+@inject IMovimientosApiService movimientosApiService
 
 <PageTitle>TicTacToe</PageTitle>
 
@@ -164,13 +165,23 @@
 		gameStarted = true;
 	}
 
-	private void HandleCellClick(int index)
+	private async Task HandleCellClick(int index)
 	{
 		if (board[index] != null || winner != null || esEmpate)
 		{
 			return;
 		}
 
+		int fila = index / 3;
+		int columna = index % 3;
+
+		var response = await movimientosApiService.PostMovimientos(PartidaId, _currentPlayerType.ToString(), fila, columna);
+
+		if (response is Resource<bool>.Error error)
+		{
+			errorMensaje = $"No se pudo registrar el movimiento: {error.Message}";
+			return;
+		}
 		board[index] = _currentPlayerType;
 
 		winner = CheckForWinner();
