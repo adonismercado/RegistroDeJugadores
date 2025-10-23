@@ -4,9 +4,9 @@ using System.Net.Http.Json;
 
 namespace RegistroDeJugadores.BlazorWassm.Services;
 
-public class MovimientosApiService (HttpClient httpClient)
+public class MovimientosApiService (HttpClient httpClient) : IMovimientosApiService
 {
-    public async Task<Resource<MovimientosResponse[]>> GetMovimientosAsync(int partidaId)
+    public async Task<Resource<MovimientosResponse[]>> GetMovimientosAsnyc(int partidaId)
     {
         try
         {
