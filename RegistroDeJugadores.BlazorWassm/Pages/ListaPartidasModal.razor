@@ -1,5 +1,73 @@
 ﻿@inject IPartidasApiService partidasApiService
 
+<div class="modal fade @(IsOpen ? "show d-block" : "")" tabindex="-1" style="@(IsOpen ? "background-color: rgba(0,0,0,0.5);" : "")">
+	<div class="modal-dialog modal-dialog-scrollable">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Partidas Disponibles</h5>
+				<button type="button" class="btn-close" @onclick="Close"></button>
+			</div>
+
+			<div class="modal-body">
+				@if (loadingPartidas)
+				{
+					<div class="text-center">
+						<div class="spinner-border" role="status">
+							<span class="visually-hidden">Cargando...</span>
+						</div>
+					</div>
+				}
+				else if (partidas != null && partidas.Any())
+				{
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>Jugador 1</th>
+									<th>Jugador 2</th>
+									<th>Acci&oacute;n</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								@foreach (var partida in partidas)
+								{
+									<tr class="partida-item">
+										<td>@partida.PartidaId</td>
+										<td>@partida.Jugador1Id</td>
+										<td>@partida.Jugador2Id</td>
+										<td>
+											<button class="btn btn-sm btn-primary" @onclick="() => OnSelectedPartida(partida.PartidaId)">
+												Seleccionar
+											</button>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+				}
+				else
+				{
+					<div class="alert alert-info">No hay partidas para mostrar.</div>
+				}
+				
+				@if (!string.IsNullOrWhiteSpace(errorMessage))
+				{
+					<div class="alert alert-danger">@errorMessage</div>
+				}
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" @onclick="Close">
+					Cerrar
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 @code {
 	[Parameter]
 	public bool IsOpen { get; set; }
