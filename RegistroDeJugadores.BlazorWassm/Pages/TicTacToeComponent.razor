@@ -1,5 +1,6 @@
 ﻿@page "/gameboard"
 @inject IPartidasApiService partidasApiService
+@inject IMovimientosApiService movimientosApiService
 
 <PageTitle>TicTacToe</PageTitle>
 <div class="container mx-auto max-w-lg bg-white rounded-lg shadow-xl text-center">
@@ -189,6 +190,18 @@
 		}
 
 		board[index] = _currentPlayerType;
+
+		int fila = index / 3;
+		int columna = index % 3;
+
+		var jugador = _currentPlayerType == PlayerType.X ? "X" : "O";
+		var response = await movimientosApiService.PostMovimientos(PartidaId, jugador, fila, columna);
+
+		if (response is Resource<bool>.Error error)
+		{
+			errorMessage = $"Error al registrar movimiento: {error.Message}";
+			return;
+		}
 
 		winner = CheckForWinner();
 		if (winner != null)
