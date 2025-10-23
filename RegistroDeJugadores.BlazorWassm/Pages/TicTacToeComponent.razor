@@ -103,7 +103,9 @@
 		}
 	</div>
 </div>
-
+<ListaPartidasModal IsOpen="mostrarModal"
+					IsOpenChanged="(value) => mostrarModal = value"
+					OnPartidasSelected="HandlePartidaSelected" />
 
 @code {
 	private Guid CurrentSession { get; set; }
