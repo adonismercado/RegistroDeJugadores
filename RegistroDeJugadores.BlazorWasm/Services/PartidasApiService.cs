@@ -1,6 +1,7 @@
-﻿using System.Net.Http.Json;
-using RegistroDeJugadores.Shared;
+﻿using RegistroDeJugadores.Shared;
 using RegistroDeJugadores.Shared.Dtos;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace RegistroDeJugadores.BlazorWasm.Services;
 
@@ -18,7 +19,6 @@ public class PartidasApiService(HttpClient httpClient) : IPartidasApiService
             return new Resource<List<PartidaResponse>>.Error(ex.Message);
         }
     }
-
     public async Task<Resource<PartidaResponse>> GetPartidaAsync(int partidaId)
     {
         try
@@ -31,11 +31,9 @@ public class PartidasApiService(HttpClient httpClient) : IPartidasApiService
             return new Resource<PartidaResponse>.Error(ex.Message);
         }
     }
-
     public async Task<Resource<PartidaResponse>> PostPartida(int jugador1, int jugador2)
     {
         var request = new PartidaRequest(jugador1, jugador2);
-
         try
         {
             var response = await httpClient.PostAsJsonAsync("api/Partidas", request);
@@ -49,7 +47,8 @@ public class PartidasApiService(HttpClient httpClient) : IPartidasApiService
         }
         catch (NotSupportedException)
         {
-            return new Resource<PartidaResponse>.Error("Respuesta invalida de la red.");
+            return new Resource<PartidaResponse>.Error("Respuesta inválida del servidor.");
         }
+
     }
 }

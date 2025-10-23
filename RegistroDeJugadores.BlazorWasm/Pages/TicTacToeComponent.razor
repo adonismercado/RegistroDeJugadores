@@ -37,7 +37,7 @@
 					Crear Partida
 				</button>
 
-				<hr class="my-4"/>
+				<hr class="my-4" />
 
 				<h3>Unirse a Partida</h3>
 				<div class="form-group">
@@ -91,7 +91,7 @@
 
 <ModalPartidas EstaAbierto="mostrarModal"
 			   CambioEstaAbierto="(value) => mostrarModal = value"
-			   OnPartidaSelected="HandlePartidaSelected"/>
+			   OnPartidaSelected="HandlePartidaSelected" />
 
 @code {
 	public Guid CurrentSession { get; set; }
@@ -129,23 +129,30 @@
 
 	private async Task StartGame()
 	{
-		if (Jugador1Id <= 0 && Jugador2Id <= 0)
+		if (Jugador1Id <= 0 || Jugador2Id <= 0)
 		{
-			errorMensaje = "Error: Debe ingresar ambos jugadores para crear una partida.";
+			errorMensaje = "Debe ingresar ambos jugadores.";
 			return;
 		}
 
 		var response = await partidasApiService.PostPartida(Jugador1Id, Jugador2Id);
 		if (response is Resource<PartidaResponse>.Error error)
 		{
-			errorMensaje = $"Error al crear la partida: {errorMensaje}";
+			errorMensaje = $"Error al crear la partida: {error.Message}";
 			return;
 		}
 
 		PartidaId = response.Data?.PartidaId ?? 0;
+		if (PartidaId == 0)
+		{
+			errorMensaje = "No se pudo crear la partida.";
+			return;
+		}
+
 		ResetGameState();
 		gameStarted = true;
 	}
+
 
 	private async Task JoinGame()
 	{
@@ -168,38 +175,27 @@
 	private async Task HandleCellClick(int index)
 	{
 		if (board[index] != null || winner != null || esEmpate)
-		{
 			return;
-		}
 
 		int fila = index / 3;
 		int columna = index % 3;
 
 		var response = await movimientosApiService.PostMovimientos(PartidaId, _currentPlayerType.ToString(), fila, columna);
-
 		if (response is Resource<bool>.Error error)
 		{
 			errorMensaje = $"No se pudo registrar el movimiento: {error.Message}";
-			return;
 		}
+
 		board[index] = _currentPlayerType;
 
-		winner = CheckForWinner();
-		if (winner != null)
-		{
-			return; // El juego termina.
-		}
-
-		esEmpate = board.All(cell => cell != null);
-		if (esEmpate)
-		{
-			return; // El juego termina.
-		}
-
-		_currentPlayerType = (_currentPlayerType == PlayerType.X)
-			? PlayerType.O
+		_currentPlayerType = (_currentPlayerType == PlayerType.X) 
+			? PlayerType.O 
 			: PlayerType.X;
+
+		winner = CheckForWinner();
+		esEmpate = board.All(cell => cell != null);
 	}
+
 
 	private PlayerType? CheckForWinner()
 	{
@@ -251,8 +247,8 @@
 
 	private void ResetGameState()
 	{
-		board = new PlayerType?[9];   
-		_currentPlayerType = PlayerType.X;  
+		board = new PlayerType?[9];
+		_currentPlayerType = PlayerType.X;
 		winner = null;
 		esEmpate = false;
 		errorMensaje = string.Empty;

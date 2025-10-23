@@ -1,6 +1,7 @@
-﻿using System.Net.Http.Json;
-using RegistroDeJugadores.Shared;
+﻿using RegistroDeJugadores.Shared;
 using RegistroDeJugadores.Shared.Dtos;
+using System.Net.Http;
+using System.Net.Http.Json;
 
 namespace RegistroDeJugadores.BlazorWasm.Services;
 
@@ -19,23 +20,19 @@ public class MovimientosApiService(HttpClient httpClient) : IMovimientosApiServi
         }
     }
 
-    public async Task<Resource<bool>> PostMovimientos(int partidaId, string jugador, int posicionFila, int posicionColumna)
+    public async Task<Resource<bool>> PostMovimientos(int partidaId, string jugador, int fila, int columna)
     {
-        var request = new MovimientosRequest(partidaId, jugador, posicionFila, posicionColumna);
+        var request = new MovimientosRequest(partidaId, jugador, fila, columna);
 
         try
         {
-            var response = await httpClient.PostAsJsonAsync("/api/Movimientos", request);
+            var response = await httpClient.PostAsJsonAsync($"api/Movimientos", request);
             response.EnsureSuccessStatusCode();
             return new Resource<bool>.Success(true);
         }
         catch (HttpRequestException ex)
         {
             return new Resource<bool>.Error($"Error de red: {ex.Message}");
-        }
-        catch (NotSupportedException)
-        {
-            return new Resource<bool>.Error($"Respuesta invalida del servidor");
         }
     }
 }
