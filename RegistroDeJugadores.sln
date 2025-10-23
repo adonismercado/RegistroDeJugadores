@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistroDeJugadores", "RegistroDeJugadores\RegistroDeJugadores.csproj", "{4FA2C618-69F6-4D7D-8FE3-7380BCBFD328}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistroDeJugadores.BlazorWassm", "RegistroDeJugadores.BlazorWassm\RegistroDeJugadores.BlazorWassm.csproj", "{F3738619-55E9-4570-8177-CDF6AAE543B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{4FA2C618-69F6-4D7D-8FE3-7380BCBFD328}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FA2C618-69F6-4D7D-8FE3-7380BCBFD328}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FA2C618-69F6-4D7D-8FE3-7380BCBFD328}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3738619-55E9-4570-8177-CDF6AAE543B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3738619-55E9-4570-8177-CDF6AAE543B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3738619-55E9-4570-8177-CDF6AAE543B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3738619-55E9-4570-8177-CDF6AAE543B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
