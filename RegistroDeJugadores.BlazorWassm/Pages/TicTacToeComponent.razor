@@ -1,6 +1,110 @@
 ﻿@page "/gameboard"
 @inject IPartidasApiService partidasApiService
 
+<PageTitle>TicTacToe</PageTitle>
+<div class="container mx-auto max-w-lg display-6 bg-white rounded-lg shadow-xl text-center">
+	<div class="game-container">
+		@if (!gameStarted)
+		{
+			<div class="container-fluid py-5">
+				<h1 class="display-3 fw-bold">TicTacToe</h1>
+				<p class="fs-12">
+					Cada jugador solo debe colocar su símbolo una vez por turno y no debe ser sobre una casilla ya jugada.
+					En caso de que el jugador haga trampa el ganador será el otro. Se debe conseguir realizar una línea recta o diagonal por símbolo para ganar.
+				</p>
+			</div>
+
+			@*SELECCIONAR JUGADORES Y CREAR PARTIDA O UNIRSE A UNA PARTIDA EXISTENTE*@
+
+			<div class="selection-screen">
+				<h1>Elige los Jugadores</h1>
+				<div class="player-buttons">
+					<div class="mb-3">
+						<label><strong>Jugador X</strong></label>
+						<input type="number" class="form-control" @bind="Jugador1Id" placeholder="Jugador 1 ID" />
+					</div>
+
+					<div class="mb-3">
+						<label><strong>Jugador 2 ID</strong></label>
+						<input type="number" class="form-control" @bind="Jugador2Id" placeholder="Jugador 2 ID" />
+					</div>
+				</div>
+
+				@*BOTON CREAR PARTIDA*@
+				<button class="btn-success btn-lg mt-2"
+						disabled="@(Jugador1Id == 0 || Jugador2Id == 0)"
+						@onclick="StartGame">
+					Crear Partida
+				</button>
+
+				<hr class="my-4" />
+
+				@*UNIRSE A PARTIDA*@
+				<h3>Unirse a Partida Existente</h3>
+				<div class="form-group">
+					<label for="partidaId"><strong>ID de la Partida:</strong></label>
+					<div class="input-group">
+						<input id="partidaId" type="number" class="form-control" @bind="PartidaId" placeholder="ID Partida" />
+						<button class="btn btn-outline-secondary" type="button" @onclick="AbrirModalPartidas">
+							<span class="bi-search-icon"></span>
+						</button>
+					</div>
+				</div>
+
+				<button class="btn btn-dark btn-lg mt-3"
+						disabled="@(PartidaId == 0)"
+						@onclick="JoinGame">
+					Unirse a la Partida
+				</button>
+
+				@if (!string.IsNullOrWhiteSpace(errorMessage))
+				{
+					<div class="alert alert-danger">@errorMessage</div>
+				}
+			</div>
+		}
+		else
+		{
+			@* PANTALLA DE JUEGO *@
+			<div class="game-screen">
+				<h2>Partida #@PartidaId</h2>
+				<h2 class="game-status">@GameStatus</h2>
+
+				<div class="game-board">
+					@for (var i = 0; i < 9; i++)
+					{
+						var cellIndex = i; // Copia local para evitar problemas con el closure en el lambda
+						<button class="cell @GetPlayerClass(board[cellIndex])"
+						   		@onclick="() => HandleCellClick(cellIndex)"
+						   		disabled="@(board[cellIndex] != null || winner != null || esEmpate)">
+						   	@board[cellIndex]?.ToString()
+						  </button>
+					}
+				</div>
+
+				<div class="mt-4">
+					<button class="btn btn-info me-2" @onclick="RefreshGameState" disabled="@refreshing">
+						@if (refreshing)
+						{
+							<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+							<span> Cargando...</span>
+						}
+						else
+						{
+							<span>🔄 Refrescar Estado</span>
+						}
+					</button>
+
+					<button class="btn btn-secondary" @onclick="LeaveGame">
+						Salir de la Partida
+					</button>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+
 @code {
 	private Guid CurrentSession { get; set; }
 	public bool gameStarted { get; set; }
