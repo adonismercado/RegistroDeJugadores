@@ -1,0 +1,55 @@
+﻿@inject IPartidasApiService partidasApiService
+
+@code {
+	[Parameter]
+	public bool IsOpen { get; set; }
+
+	[Parameter]
+	public EventCallback<bool> IsOpenChanged { get; set; }
+
+	[Parameter]
+	public EventCallback<int> OnPartidasSelected { get; set; }
+
+	private bool loadingPartidas = false;
+	private List<PartidasResponse>? partidas;
+	private string? errorMessage;
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (IsOpen && partidas == null)
+		{
+			await LoadPartidas();
+		}
+	}
+
+	private async Task LoadPartidas()
+	{
+		loadingPartidas = true;
+		errorMessage = null;
+
+		var response = await partidasApiService.GetPartidasAsync();
+		if (response is Resource<List<PartidasResponse>>.Success success)
+		{
+			partidas = success.Data;
+		}
+		else if (response is Resource<List<PartidasResponse>>.Error error)
+		{
+			errorMessage = $"Error al cargar las partidas: {error.Message}";
+		}
+
+		loadingPartidas = false;
+	}
+
+	private async Task OnSelectedPartida(int partidaId)
+	{
+		await OnPartidasSelected.InvokeAsync(partidaId);
+		await Close();
+	}
+
+	private async Task Close()
+	{
+		partidas = null;
+		errorMessage = null;
+		await IsOpenChanged.InvokeAsync(false);
+	}
+}
