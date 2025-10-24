@@ -4,6 +4,6 @@ namespace RegistroDeJugadores.BlazorWassm.Services;
 
 public interface IMovimientosApiService
 {
-    Task<Resource<MovimientosResponse[]>> GetMovimientosAsnyc(int partidaId);
-    Task<Resource<bool>> PostMovimientos(int partidaId, string jugador, int posicionFila, int posicionColumna);
+    Task<Resource<List<MovimientosResponse>>> GetMovimientosAsnyc(int partidaId);
+    Task<Resource<MovimientosResponse>> PostMovimiento(int partidaId, string jugador, int posicionFila, int posicionColumna);
 }
