@@ -52,8 +52,13 @@
 					</div>
 				</div>
 
+				<div class="mb-3 mt-3">
+					<label><strong>Tu ID de Jugador:</strong></label>
+					<input type="number" class="form-control" @bind="MiJugadorId" placeholder="Tu ID de Jugador" />
+				</div>
+				
 				<button class="btn btn-dark btn-lg mt-3"
-						disabled="@(PartidaId == 0)"
+						disabled="@(PartidaId == 0 || MiJugadorId == 0)"
 						@onclick="JoinGame">
 					Unirse a la Partida
 				</button>
