@@ -26,14 +26,14 @@
 					</div>
 
 					<div class="mb-3">
-						<label><strong>Jugador 2 ID</strong></label>
+						<label><strong>Jugador O</strong></label>
 						<input type="number" class="form-control" @bind="Jugador2Id" placeholder="Jugador 2 ID" />
 					</div>
 				</div>
 
 				@*BOTON CREAR PARTIDA*@
 				<button class="btn btn-success btn-lg mt-2"
-						disabled="@(Jugador1Id == 0 || Jugador2Id == 0)"
+						disabled="@(Jugador1Id == 0)"
 						@onclick="StartGame">
 					Crear Partida
 				</button>
@@ -119,13 +119,15 @@
 
 	public enum PlayerType { X, O }
 	public int Jugador1Id { get; set; }
-	public int Jugador2Id { get; set; }
+	public int? Jugador2Id { get; set; }
 	public int PartidaId { get; set; }
+	public int MiJugadorId { get; set; }
 
 	public string? errorMessage { get; set; }
 	public bool refreshing = false;
 	public bool mostrarModal = false;
 
+	private string MiSimbolo => MiJugadorId == Jugador1Id ? "X" : "O";
 	private string GameStatus
 	{
 		get
@@ -148,19 +150,16 @@
 
 	private async Task StartGame()
 	{
-		if (Jugador1Id <= 0 || Jugador2Id <= 0)
-		{
-			errorMessage = "Debe ingresar ambos jugadores.";
-			return;
-		}
-
 		var response = await partidasApiService.PostPartida(Jugador1Id, Jugador2Id);
 		if (response is Resource<PartidasResponse>.Error error)
 		{
 			errorMessage = $"Error al crear la partida: {error.Message}";
+			return;
 		}
 
 		PartidaId = response.Data?.PartidaId ?? 0;
+		MiJugadorId = Jugador1Id;
+		_currentPlayerType = PlayerType.X;
 		gameStarted = true;
 	}
 
@@ -195,9 +194,9 @@
 		int columna = index % 3;
 
 		var jugador = _currentPlayerType == PlayerType.X ? "X" : "O";
-		var response = await movimientosApiService.PostMovimientos(PartidaId, jugador, fila, columna);
+		var response = await movimientosApiService.PostMovimiento(PartidaId, jugador, fila, columna);
 
-		if (response is Resource<bool>.Error error)
+		if (response is Resource<MovimientosResponse>.Error error)
 		{
 			errorMessage = $"Error al registrar movimiento: {error.Message}";
 			return;
