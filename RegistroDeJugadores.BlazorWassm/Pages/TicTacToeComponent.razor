@@ -188,6 +188,7 @@
 		MiJugadorId = Jugador1Id;
 		_currentPlayerType = PlayerType.X;
 		gameStarted = true;
+		StartPolling();
 	}
 
 	private async Task JoinGame()
@@ -222,6 +223,8 @@
 		}
 		_currentPlayerType = PlayerType.X;
 		gameStarted = true;
+		await RefreshGameState();
+		StartPolling();
 	}
 
 	private async Task HandleCellClick(int index)
@@ -248,12 +251,14 @@
 		winner = CheckForWinner();
 		if (winner != null)
 		{
+			StopPolling();
 			return; // Juego terminado.
 		}
 
 		esEmpate = board.All(cell => cell != null);
 		if (esEmpate)
 		{
+			StopPolling();
 			return; // Juego terminado.
 		}
 
@@ -284,11 +289,18 @@
 			_currentPlayerType = movimientos.Count % 2 == 0 ? PlayerType.X : PlayerType.O;
 
 			winner = CheckForWinner();
-			if (winner == null)
+			if (winner != null)
+			{
+				StopPolling(); 
+			}
+			else
 			{
 				esEmpate = board.All(cell => cell != null);
+				if (esEmpate)
+				{
+					StopPolling(); 
+				}
 			}
-			StateHasChanged();
 		}
 
 		refreshing = false;
