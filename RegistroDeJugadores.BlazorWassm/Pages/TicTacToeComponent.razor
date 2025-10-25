@@ -238,7 +238,32 @@
 	private async Task RefreshGameState()
 	{
 		refreshing = true;
-		await Task.Delay(2000);
+
+		var response = await movimientosApiService.GetMovimientosAsnyc(PartidaId);
+		if (response is Resource<List<MovimientosResponse>>.Success success)
+		{
+			var movimientos = success.Data;
+
+			board = new PlayerType?[9];
+			foreach (var move in movimientos)
+			{
+				int index = move.PosicionFila * 3 + move.PosicionColumna;
+				board[index] = move.Jugador == "X"
+								? PlayerType.X
+								: PlayerType.O;
+			}
+
+			// Determinar de quien es el turno, si es par es turno de X, si es impar es turno de O
+			_currentPlayerType = movimientos.Count % 2 == 0 ? PlayerType.X : PlayerType.O;
+
+			winner = CheckForWinner();
+			if (winner == null)
+			{
+				esEmpate = board.All(cell => cell != null);
+			}
+			StateHasChanged();
+		}
+
 		refreshing = false;
 	}
 
