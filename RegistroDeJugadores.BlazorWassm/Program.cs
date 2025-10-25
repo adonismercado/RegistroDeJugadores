@@ -7,7 +7,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://gestionhuacalesapijdepena-czdxg0bcgjeedhdm.eastus2-01.azurewebsites.net/") });
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://gestionhuacalesapi.azurewebsites.net/") });
 builder.Services.AddScoped<IPartidasApiService, PartidasApiService>();
 builder.Services.AddScoped<IMovimientosApiService, MovimientosApiService>();
 
