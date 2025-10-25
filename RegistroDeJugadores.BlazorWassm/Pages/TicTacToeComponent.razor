@@ -128,6 +128,7 @@
 	public bool mostrarModal = false;
 
 	private string MiSimbolo => MiJugadorId == Jugador1Id ? "X" : "O";
+
 	private string GameStatus
 	{
 		get
@@ -136,9 +137,18 @@
 			{
 				return $"🏆 ¡Ganador: {winner}!";
 			}
-			return esEmpate
-				? "🤝 ¡Es un empate!"
-				: $"Turno de: {_currentPlayerType}";
+			if (esEmpate)
+			{
+				return "🤝 ¡Es un empate!";
+			}
+
+			var turn = _currentPlayerType.ToString();
+			var itsMyTurn = (_currentPlayerType == PlayerType.X && MiJugadorId == Jugador1Id)
+							|| (_currentPlayerType == PlayerType.O && MiJugadorId == Jugador2Id);
+
+			return itsMyTurn
+				? $"✅ Tu turno ({turn})"
+				: $"⏳ Esperando al oponente ({turn})";
 		}
 	}
 
