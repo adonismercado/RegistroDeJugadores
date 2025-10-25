@@ -165,9 +165,9 @@
 
 	private async Task JoinGame()
 	{
-		if (PartidaId <= 0)
+		if (PartidaId <= 0 || MiJugadorId == 0)
 		{
-			errorMessage = "Error: Debe ingresar el ID de la partida.";
+			errorMessage = "Error: Debe ingresar el ID de la partida y tu ID de jugador.";
 			return;
 		}
 
@@ -178,6 +178,22 @@
 			return;
 		}
 
+		var partida = response.Data;
+		Jugador1Id = partida.Jugador1Id;
+		Jugador2Id = partida.Jugador2Id;
+
+		// Si el jugador 2 no esta, hacer put para añadir al jugador 2
+		if (Jugador2Id == null || Jugador2Id == 0)
+		{
+			var update = await partidasApiService.PutPartida(PartidaId, Jugador1Id, Jugador2Id);
+			if (update is Resource<PartidasResponse>.Error updError)
+			{
+				errorMessage = $"Error al ingresar el jugador 2: {updError.Message}";
+				return;
+			}
+			Jugador2Id = MiJugadorId;
+		}
+		_currentPlayerType = PlayerType.X;
 		gameStarted = true;
 	}
 
