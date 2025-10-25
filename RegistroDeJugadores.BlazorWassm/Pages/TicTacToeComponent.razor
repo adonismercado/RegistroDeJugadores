@@ -75,6 +75,9 @@
 			<div class="game-screen">
 				<h2>Partida #@PartidaId</h2>
 				<h2 class="game-status">@GameStatus</h2>
+				<div class="alert alert-info">
+					<strong>Eres:</strong> Jugador @MiJugadorId (@MiSimbolo)
+				</div>
 
 				<div class="game-board">
 					@for (var i = 0; i < 9; i++)
@@ -82,7 +85,7 @@
 						var cellIndex = i; // Copia local para evitar problemas con el closure en el lambda
 						<button class="cell @GetPlayerClass(board[cellIndex])"
 						   		@onclick="() => HandleCellClick(cellIndex)"
-						   		disabled="@(board[cellIndex] != null || winner != null || esEmpate)">
+						   		disabled="@(!CanPlay() || board[cellIndex] != null || winner != null || esEmpate)">
 						   	@board[cellIndex]?.ToString()
 						  </button>
 					}
