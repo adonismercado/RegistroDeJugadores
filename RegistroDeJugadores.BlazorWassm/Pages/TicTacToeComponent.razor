@@ -299,6 +299,21 @@
 			: "player-o";
 	}
 
+	private bool CanPlay()
+	{
+		if (_currentPlayerType == PlayerType.X && MiJugadorId == Jugador1Id)
+		{
+			return true;
+		}
+
+		if (_currentPlayerType == PlayerType.O && MiJugadorId == Jugador2Id)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	private void LeaveGame()
 	{
 		gameStarted = false;
