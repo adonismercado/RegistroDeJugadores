@@ -1,0 +1,132 @@
+﻿@page "/gameboard"
+@inject TicTacToeService gameService
+@inject NavigationManager navigationManager
+
+<PageTitle>TicTacToe - Partida #@gameService.PartidaId</PageTitle>
+
+<div class="container mx-auto max-w-lg bg-white rounded-lg shadow-xl text-center">
+	<div class="game-container">
+		<div class="game-screen">
+			<h2>Partida #@gameService.PartidaId</h2>
+			<h2 class="game-status">@GameStatus</h2>
+			<div class="alert alert-info">
+				<strong>Eres:</strong> Jugador @gameService.MiJugadorId (@gameService.MiSimbolo)
+			</div>
+
+			<div class="game-board">
+				@for (var i = 0; i < 9; i++)
+				{
+					var cellIndex = i;
+					<button class="cell @GetPlayerClass(gameService.Board[cellIndex])"
+							@onclick="() => HandleCellClick(cellIndex)"
+							disabled="@(gameService.Board[cellIndex] != null || gameService.Winner != null || gameService.EsEmpate)">
+						@gameService.Board[cellIndex]?.ToString()
+					</button>
+				}
+			</div>
+
+			<hr />
+
+			<button class="btn btn-secondary" @onclick="LeaveGame">
+				Salir de la Partida
+			</button>
+
+			@if (!string.IsNullOrWhiteSpace(gameService.ErrorMessage))
+			{
+				<div class="alert alert-danger mt-3">
+					@gameService.ErrorMessage
+				</div>
+			}
+		</div>
+	</div>
+</div>
+
+@code {
+	protected override void OnInitialized()
+	{
+		if (!gameService.GameStarted || gameService.PartidaId == 0)
+		{
+			navigationManager.NavigateTo("/");
+		}
+	}
+
+	private string GameStatus
+	{
+		get
+		{
+			if (gameService.Winner != null)
+			{
+				return $"🏆 ¡Ganador: {gameService.Winner}!";
+			}
+			return gameService.EsEmpate
+				? "🤝 ¡Es un empate!"
+				: $"Turno de: {gameService.CurrentPlayerType}";
+		}
+	}
+
+	private void HandleCellClick(int index)
+	{
+		if (gameService.Board[index] != null || gameService.Winner != null || gameService.EsEmpate)
+		{
+			return;
+		}
+
+		gameService.Board[index] = gameService.CurrentPlayerType;
+
+		gameService.Winner = CheckForWinner();
+		if (gameService.Winner != null)
+		{
+			return;
+		}
+
+		gameService.EsEmpate = gameService.Board.All(cell => cell != null);
+		if (gameService.EsEmpate)
+		{
+			return;
+		}
+
+		gameService.CurrentPlayerType = (gameService.CurrentPlayerType == TicTacToeService.PlayerType.X)
+			? TicTacToeService.PlayerType.O
+			: TicTacToeService.PlayerType.X;
+	}
+
+	private TicTacToeService.PlayerType? CheckForWinner()
+	{
+		var winningLines = new[]
+		{
+			new[] {0, 1, 2}, new[] {3, 4, 5}, new[] {6, 7, 8},
+			new[] {0, 3, 6}, new[] {1, 4, 7}, new[] {2, 5, 8},
+			new[] {0, 4, 8}, new[] {2, 4, 6}
+		};
+
+		foreach (var line in winningLines)
+		{
+			var (a, b, c) = (line[0], line[1], line[2]);
+			if (gameService.Board[a].HasValue &&
+				gameService.Board[a] == gameService.Board[b] &&
+				gameService.Board[a] == gameService.Board[c])
+			{
+				return gameService.Board[a];
+			}
+		}
+
+		return null;
+	}
+
+	private string GetPlayerClass(TicTacToeService.PlayerType? player)
+	{
+		if (!player.HasValue)
+		{
+			return "";
+		}
+		return player == TicTacToeService.PlayerType.X
+			? "player-x"
+			: "player-o";
+	}
+
+	private void LeaveGame()
+	{
+		gameService.ResetGame();
+		navigationManager.NavigateTo("/");
+	}
+}
