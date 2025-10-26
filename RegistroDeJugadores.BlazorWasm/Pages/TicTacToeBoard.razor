@@ -1,5 +1,6 @@
 ﻿@page "/gameboard"
 @inject TicTacToeService gameService
+@inject IMovimientosApiService movimientosApiService
 @inject NavigationManager navigationManager
 
 <PageTitle>TicTacToe - Partida #@gameService.PartidaId</PageTitle>
@@ -63,8 +64,7 @@
 				: $"Turno de: {gameService.CurrentPlayerType}";
 		}
 	}
-
-	private void HandleCellClick(int index)
+	private async Task HandleCellClick(int index)
 	{
 		if (gameService.Board[index] != null || gameService.Winner != null || gameService.EsEmpate)
 		{
@@ -72,6 +72,19 @@
 		}
 
 		gameService.Board[index] = gameService.CurrentPlayerType;
+
+		int fila = index / 3;
+		int columna = index % 3;
+		var jugador = gameService.CurrentPlayerType == TicTacToeService.PlayerType.X ? "X" : "O";
+
+		var response = await movimientosApiService.PostMovimientos(gameService.PartidaId, jugador, fila, columna);
+
+		if (response is Resource<MovimientoResponse>.Error error)
+		{
+			gameService.ErrorMessage = $"Error al registrar movimiento: {error.Message}";
+			gameService.Board[index] = null;
+			return;
+		}
 
 		gameService.Winner = CheckForWinner();
 		if (gameService.Winner != null)
@@ -89,6 +102,7 @@
 			? TicTacToeService.PlayerType.O
 			: TicTacToeService.PlayerType.X;
 	}
+
 
 	private TicTacToeService.PlayerType? CheckForWinner()
 	{
