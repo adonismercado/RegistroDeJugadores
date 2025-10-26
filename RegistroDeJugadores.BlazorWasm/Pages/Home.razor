@@ -1,7 +1,78 @@
 ﻿@page "/"
+@inject TicTacToeService gameService
+@inject IPartidasApiService partidasApiService
+@inject NavigationManager navigationManager
 
-<PageTitle>Home</PageTitle>
+<div class="container mx-auto max-w-lg bg-white rounded-lg shadow-xl text-center">
+	<div class="game-container">
+		@if (!gameService.GameStarted)
+		{
+			<div class="selection-screen">
+				<h1>Elige los jugadores</h1>
 
-<h1>Hello, world!</h1>
+				<div class="mb-3">
+					<label><strong>ID Jugador 1 (X)</strong></label>
+					<input type="number"
+						   class="form-control mt-2"
+						   placeholder="Ingresa ID del Jugador 1"
+						   value="@gameService.Jugador1Id"
+						   @onchange="@(e => {
+										gameService.Jugador1Id = string.IsNullOrEmpty(e.Value?.ToString())
+																? 0
+																: int.Parse(e.Value.ToString());
+							})" />
+  			</div>
 
-Welcome to your new app.
+			<div class="mb-3">
+				<label><strong>ID Jugador 2 (O)</strong></label>
+				<input type="number"
+					   class="form-control mt-2"
+					   placeholder="Ingresa ID del Jugador 2"
+					   value="@gameService.Jugador2Id"
+					   @onchange="@(e => {
+									gameService.Jugador2Id = string.IsNullOrEmpty(e.Value?.ToString())
+															? null
+															: int.Parse(e.Value.ToString());
+						})" />
+			</div>
+
+			@* Boton Iniciar Partida *@
+			<button class="btn btn-success btn-lg mt-4"
+					disabled="@(gameService.Jugador1Id == 0)"
+					@onclick="StartGame">
+					Iniciar Partida
+			</button>
+
+			@if (!string.IsNullOrEmpty(gameService.ErrorMessage))
+			{
+				<div class="alert alert-danger mt-3">
+					@gameService.ErrorMessage
+				</div>
+			}
+		</div>
+		}
+	</div>
+</div>
+
+@code {
+	private async Task StartGame()
+	{
+		if (gameService.Jugador1Id > 0)
+		{
+			var response = await partidasApiService.PostPartida(gameService.Jugador1Id, gameService.Jugador2Id);
+
+			if (response is Resource<PartidaResponse>.Error error)
+			{
+				gameService.ErrorMessage = $"Error al crear la partida: {error.Message}";
+				return;
+			}
+
+			gameService.PartidaId = response.Data?.PartidaId ?? 0;
+			gameService.MiJugadorId = gameService.Jugador1Id;
+			gameService.CurrentPlayerType = TicTacToeService.PlayerType.X;
+			gameService.GameStarted = true;
+
+			navigationManager.NavigateTo("/gameboard");
+		}
+	}
+}

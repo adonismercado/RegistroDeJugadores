@@ -3,6 +3,6 @@
 namespace RegistroDeJugadores.Shared.Dtos;
 
 public record PartidaResponse(
-    int Partidaid,
+    int PartidaId,
     int Jugador1Id,
     int? Jugador2Id);
