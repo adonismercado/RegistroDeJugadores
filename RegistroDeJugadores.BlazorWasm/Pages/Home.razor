@@ -24,7 +24,7 @@
 
 				<button class="btn btn-success btn-lg mt-4"
 						disabled="@(gameService.Jugador1Id == 0)"
-						@onclick="CrearPartida">
+						@onclick="StartGame">
 					Crear Partida
 				</button>
 
@@ -43,7 +43,7 @@
 
 				<button class="btn btn-dark btn-lg mt-3"
 						disabled="@(partidaIdUnirse == 0 || miJugadorIdUnirse == 0)"
-						@onclick="UnirsePartida">
+						@onclick="JoinGame">
 					Unirse a la Partida
 				</button>
 
@@ -62,7 +62,10 @@
 	private int partidaIdUnirse = 0;
 	private int miJugadorIdUnirse = 0;
 
-	private async Task CrearPartida()
+	private bool mostrarModal = false;
+	private List<PartidaResponse?> partidasDisponibles;
+
+	private async Task StartGame()
 	{
 		var response = await partidasApiService.PostPartida(gameService.Jugador1Id, gameService.Jugador2Id);
 
@@ -81,7 +84,7 @@
 
 	}
 
-	private async Task UnirsePartida()
+	private async Task JoinGame()
 	{
 		if (partidaIdUnirse <= 0 || miJugadorIdUnirse == 0)
 		{
@@ -120,5 +123,36 @@
 		gameService.GameStarted = true;
 
 		navigationManager.NavigateTo("/gameboard");
+	}
+
+	private async Task MostrarPartidasDisponibles()
+	{
+		mostrarModal = true;
+		partidasDisponibles = null;
+		StateHasChanged();
+
+		var response = await partidasApiService.GetPartidas();
+		if (response is Resource<List<PartidaResponse>>.Success success)
+		{
+			partidasDisponibles = success.Data
+				.Where(p => p.Jugador2Id == 0 || p.Jugador2Id == null)
+				.ToList();
+		}
+		else
+		{
+			partidasDisponibles = new List<PartidaResponse();
+			gameService.ErrorMessage = "Error al cargar las partidas disponibles.";
+		}
+	}
+
+	private void CerrarModal()
+	{
+		mostrarModal = false;
+	}
+
+	private void PartidaSeleccionada(int partidaId)
+	{
+		partidaIdUnirse = partidaId;
+		mostrarModal = false;
 	}
 }
