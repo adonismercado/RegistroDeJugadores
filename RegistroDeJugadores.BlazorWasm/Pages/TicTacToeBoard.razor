@@ -1,0 +1,266 @@
+﻿@page "/gameboard"
+@inject TicTacToeService gameService
+@inject IMovimientosApiService movimientosApiService
+@inject IPartidasApiService partidasApiService
+@inject NavigationManager navigationManager
+
+<PageTitle>TicTacToe - Partida #@gameService.PartidaId</PageTitle>
+
+<div class="container mx-auto max-w-lg bg-white rounded-lg shadow-xl text-center">
+	<div class="game-container">
+		<div class="game-screen">
+			<h2>Partida #@gameService.PartidaId</h2>
+			<h2 class="game-status">@GameStatus</h2>
+			<div class="alert alert-info">
+				<strong>Eres:</strong> Jugador @gameService.MiJugadorId (@gameService.MiSimbolo)
+			</div>
+
+
+
+			@if (gameService.Jugador2Id == null || gameService.Jugador2Id == 0)
+			{
+				<div class="alert alert-warning">
+					Esperando al Jugador 2...
+				</div>
+			}
+			else
+			{
+				<div class="game-board">
+					@for (var i = 0; i < 9; i++)
+					{
+						var cellIndex = i;
+						<button class="cell @GetPlayerClass(gameService.Board[cellIndex])"
+								@onclick="() => HandleCellClick(cellIndex)"
+								disabled="@(gameService.Board[cellIndex] != null || gameService.Winner != null || gameService.EsEmpate)">
+							@gameService.Board[cellIndex]?.ToString()
+						</button>
+					}
+				</div>
+
+				@if (!string.IsNullOrEmpty(EsperandoMovimiento))
+				{
+					<div class="alert alert-warning mb-0 py-1 mt-3">
+						@EsperandoMovimiento
+					</div>
+				}
+			}
+			<hr />
+
+			<button class="btn btn-secondary" @onclick="LeaveGame">
+				Salir de la Partida
+			</button>
+
+			@if (!string.IsNullOrWhiteSpace(gameService.ErrorMessage))
+			{
+				<div class="alert alert-danger mt-3">
+					@gameService.ErrorMessage
+				</div>
+			}
+		</div>
+	</div>
+</div>
+
+@code {
+	private Timer? refreshTimer;
+
+	protected override void OnInitialized()
+	{
+		if (!gameService.GameStarted || gameService.PartidaId == 0)
+		{
+			navigationManager.NavigateTo("/");
+			return;
+		}
+
+		refreshTimer = new Timer(async _ => await RefreshGameState(), null, 0, 2000);
+	}
+
+	private string GameStatus
+	{
+		get
+		{
+			if (gameService.Winner != null)
+			{
+				return $"🏆 ¡Ganador: {gameService.Winner}!";
+			}
+			return gameService.EsEmpate
+				? "🤝 ¡Es un empate!"
+				: $"Turno de: {gameService.CurrentPlayerType}";
+		}
+	}
+
+	private async Task HandleCellClick(int index)
+	{
+		if (gameService.Board[index] != null || gameService.Winner != null || gameService.EsEmpate)
+		{
+			return;
+		}
+
+		// Verificar si el jugador 2 está conectado
+		if (gameService.Jugador2Id == null || gameService.Jugador2Id == 0)
+		{
+			gameService.ErrorMessage = "Esperando al jugador 2...";
+			await Task.Delay(1000);
+			gameService.ErrorMessage = null;
+			await InvokeAsync(StateHasChanged);
+			return;
+		}
+
+		//Verificacion de que no es el turno de X u O
+		if (gameService.MiSimbolo != gameService.CurrentPlayerType.ToString())
+		{
+			gameService.ErrorMessage = "No es tu turno.";
+			await Task.Delay(1000);
+			gameService.ErrorMessage = null;
+			await InvokeAsync(StateHasChanged);
+			return;
+		}
+
+		gameService.Board[index] = gameService.CurrentPlayerType;
+
+		int fila = index / 3;
+		int columna = index % 3;
+		var jugador = gameService.CurrentPlayerType == TicTacToeService.PlayerType.X ? "X" : "O";
+
+		var response = await movimientosApiService.PostMovimientos(gameService.PartidaId, jugador, fila, columna);
+
+		if (response is Resource<MovimientoResponse>.Error error)
+		{
+			gameService.ErrorMessage = $"Error al registrar movimiento: {error.Message}";
+			gameService.Board[index] = null;
+			return;
+		}
+
+		gameService.Winner = CheckForWinner();
+		if (gameService.Winner != null)
+		{
+			return;
+		}
+
+		gameService.EsEmpate = gameService.Board.All(cell => cell != null);
+		if (gameService.EsEmpate)
+		{
+			return;
+		}
+
+		gameService.CurrentPlayerType = (gameService.CurrentPlayerType == TicTacToeService.PlayerType.X)
+			? TicTacToeService.PlayerType.O
+			: TicTacToeService.PlayerType.X;
+
+		await RefreshGameState();
+	}
+
+	private TicTacToeService.PlayerType? CheckForWinner()
+	{
+		var winningLines = new[]
+		{
+			new[] {0, 1, 2}, new[] {3, 4, 5}, new[] {6, 7, 8},
+			new[] {0, 3, 6}, new[] {1, 4, 7}, new[] {2, 5, 8},
+			new[] {0, 4, 8}, new[] {2, 4, 6}
+		};
+
+		foreach (var line in winningLines)
+		{
+			var (a, b, c) = (line[0], line[1], line[2]);
+			if (gameService.Board[a].HasValue &&
+				gameService.Board[a] == gameService.Board[b] &&
+				gameService.Board[a] == gameService.Board[c])
+			{
+				return gameService.Board[a];
+			}
+		}
+
+		return null;
+	}
+
+	private string GetPlayerClass(TicTacToeService.PlayerType? player)
+	{
+		if (!player.HasValue)
+		{
+			return "";
+		}
+		return player == TicTacToeService.PlayerType.X
+			? "player-x"
+			: "player-o";
+	}
+
+	private void LeaveGame()
+	{
+		Dispose();
+		gameService.ResetGame();
+		navigationManager.NavigateTo("/");
+	}
+
+	private string? EsperandoMovimiento
+	{
+		get
+		{
+			// Si hay ganador o empate, no mostrar mensaje
+			if (gameService.Winner != null || gameService.EsEmpate)
+			{
+				return null;
+			}
+
+			if (gameService.Jugador2Id != null && gameService.Jugador2Id != 0)
+			{
+				if (gameService.MiSimbolo != gameService.CurrentPlayerType.ToString())
+				{
+					return "Esperando al otro jugador que haga su movimiento...";
+				}
+			}
+
+			return null;
+		}
+	}
+
+
+	private async Task RefreshGameState()
+	{
+		var response = await movimientosApiService.GetMovimientos(gameService.PartidaId);
+		if (response is Resource<List<MovimientoResponse>>.Success success)
+		{
+			Array.Clear(gameService.Board, 0, gameService.Board.Length);
+
+			var movimientos = success.Data;
+			foreach (var mov in movimientos)
+			{
+				int index = mov.PosicionFila * 3 + mov.PosicionColumna;
+				if (mov.Jugador == "X")
+				{
+					gameService.Board[index] = TicTacToeService.PlayerType.X;
+				}
+				else if (mov.Jugador == "O")
+				{
+					gameService.Board[index] = TicTacToeService.PlayerType.O;
+				}
+			}
+
+			gameService.Winner = CheckForWinner();
+			gameService.EsEmpate = (gameService.Winner == null) && gameService.Board.All(c => c != null);
+
+			RecalcularTurnoDesdeTablero();
+		}
+
+		var responsePartida = await partidasApiService.GetPartida(gameService.PartidaId);
+		if (responsePartida is Resource<PartidaResponse>.Success successPartida)
+		{
+			gameService.Jugador2Id = successPartida.Data.Jugador2Id;
+		}
+
+		await InvokeAsync(StateHasChanged);
+	}
+
+	public void Dispose()
+	{
+		refreshTimer?.Dispose();
+	}
+
+	private void RecalcularTurnoDesdeTablero()
+	{
+		int countX = gameService.Board.Count(c => c == TicTacToeService.PlayerType.X);
+		int countO = gameService.Board.Count(c => c == TicTacToeService.PlayerType.O);
+
+		gameService.CurrentPlayerType = (countX == countO)
+			? TicTacToeService.PlayerType.X
+			: TicTacToeService.PlayerType.O;
+	}
+}

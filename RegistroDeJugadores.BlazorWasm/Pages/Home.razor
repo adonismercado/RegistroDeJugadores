@@ -1,0 +1,227 @@
+﻿@page "/"
+@inject TicTacToeService gameService
+@inject IPartidasApiService partidasApiService
+@inject NavigationManager navigationManager
+
+<div class="container mx-auto max-w-lg bg-white rounded-lg shadow-xl text-center">
+	<div class="game-container">
+		@if (!gameService.GameStarted)
+		{
+			<div class="selection-screen">
+				<h1>Crear Nueva Partida</h1>
+				<div class="mb-3">
+					<label><strong>ID Jugador 1 (X)</strong></label>
+					<input type="number"
+						   class="form-control mt-2"
+						   placeholder="Ingresa ID del Jugador 1"
+						   @bind="gameService.Jugador1Id" />
+  				</div>
+
+				<button class="btn btn-success btn-lg mt-4"
+						disabled="@(gameService.Jugador1Id == 0)"
+						@onclick="StartGame">
+					Crear Partida
+				</button>
+
+				<hr class="my-4" />
+
+				<h3>Unirse a Partida Existente</h3>
+
+				<button class="btn btn-outline-primary mt-3" @onclick="MostrarPartidasDisponibles">
+					Ver Partidas Disponibles
+				</button>
+
+				<hr class="my-4" />
+
+				<div class="mb-3">
+					<label><strong>ID de la Partida</strong></label>
+					<input type="number" class="form-control mt-2" placeholder="ID de la partida" @bind="partidaIdUnirse" />
+				</div>
+
+				<div class="mb-3">
+					<label><strong>Tu ID de Jugador (O)</strong></label>
+					<input type="number" class="form-control mt-2" placeholder="Ingresa tu ID" @bind="miJugadorIdUnirse" />
+				</div>
+
+				<button class="btn btn-dark btn-lg mt-3"
+						disabled="@(partidaIdUnirse == 0 || miJugadorIdUnirse == 0)"
+						@onclick="JoinGame">
+					Unirse a la Partida
+				</button>
+
+				@if (!string.IsNullOrEmpty(gameService.ErrorMessage))
+				{
+					<div class="alert alert-danger mt-3">
+						@gameService.ErrorMessage
+					</div>
+				}
+			</div>
+		}
+	</div>
+</div>
+
+@if (mostrarModal)
+{
+	<div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title text-center">Partidas Disponibles</h5>
+					<button type="button" class="btn-close" @onclick="CerrarModal"></button>
+				</div>
+				
+				<div class="modal-body">
+					@if (partidasDisponibles == null)
+					{
+						<div class="text-center">
+							<div class="spinner-border text-primary"></div>
+							<p class="mt-2">Cargando partidas...</p>
+						</div>
+					}
+					else if (partidasDisponibles.Count == 0)
+					{
+						<p class="text-center text-muted">No hay partidas disponibles.</p>
+					}
+					else
+					{
+						<table class="table table-striped table-hover text-center">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>ID Jugador 1</th>
+									<th>ID Jugador 2</th>
+									<th>Accion</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								@foreach (var partida in partidasDisponibles)
+								{
+									<tr>
+										<td>@partida.PartidaId</td>
+										<td>@partida.Jugador1Id</td>
+										<td>@partida.Jugador2Id</td>
+										<td>
+											<button class="btn btn-primary btn-sm"
+												@onclick="() => PartidaSeleccionada(partida.PartidaId)">
+												Seleccionar
+											</button>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					}
+				</div>
+
+				<div class="modal-footer text-center">
+					<button class="btn btn-secondary" @onclick="CerrarModal">Salir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+@code {
+	private int partidaIdUnirse = 0;
+	private int miJugadorIdUnirse = 0;
+
+	private bool mostrarModal = false;
+	private List<PartidaResponse?> partidasDisponibles;
+
+	private async Task StartGame()
+	{
+		var response = await partidasApiService.PostPartida(gameService.Jugador1Id, gameService.Jugador2Id);
+
+		if (response is Resource<PartidaResponse>.Error error)
+		{
+			gameService.ErrorMessage = $"Error al crear la partida: {error.Message}";
+			return;
+		}
+
+		gameService.PartidaId = response.Data?.PartidaId ?? 0;
+		gameService.MiJugadorId = gameService.Jugador1Id;
+		gameService.CurrentPlayerType = TicTacToeService.PlayerType.X;
+		gameService.GameStarted = true;
+
+		navigationManager.NavigateTo("/gameboard");
+
+	}
+
+	private async Task JoinGame()
+	{
+		if (partidaIdUnirse <= 0 || miJugadorIdUnirse == 0)
+		{
+			gameService.ErrorMessage = "Debe ingresar el ID de la partida y tu ID de jugador.";
+			return;
+		}
+
+		if (partidaIdUnirse < -1 || partidaIdUnirse < -1)
+		{
+			gameService.ErrorMessage = "Debe ingresar un ID de partida y un ID de jugador valido.";	
+		}
+
+		var response = await partidasApiService.GetPartida(partidaIdUnirse);
+
+		if (response is Resource<PartidaResponse>.Error error)
+		{
+			gameService.ErrorMessage = $"Error al unirse: {error.Message}";
+			return;
+		}
+
+		var partida = response.Data;
+		gameService.PartidaId = partidaIdUnirse;
+		gameService.Jugador1Id = partida.Jugador1Id;
+		gameService.Jugador2Id = partida.Jugador2Id;
+		gameService.MiJugadorId = miJugadorIdUnirse;
+
+		if (gameService.Jugador2Id == null || gameService.Jugador2Id == 0)
+		{
+			var update = await partidasApiService.PutPartida(partidaIdUnirse, gameService.Jugador1Id, miJugadorIdUnirse);
+
+			if (update is Resource<PartidaResponse>.Error updError)
+			{
+				gameService.ErrorMessage = $"Error al ingresar como jugador 2: {updError.Message}";
+				return;
+			}
+
+			gameService.Jugador2Id = miJugadorIdUnirse;
+		}
+
+		gameService.CurrentPlayerType = TicTacToeService.PlayerType.X;
+		gameService.GameStarted = true;
+		gameService.ErrorMessage = null;
+		navigationManager.NavigateTo("/gameboard");
+	}
+
+	private async Task MostrarPartidasDisponibles()
+	{
+		mostrarModal = true;
+		partidasDisponibles = null;
+		StateHasChanged();
+
+		var response = await partidasApiService.GetPartidas();
+		if (response is Resource<List<PartidaResponse>>.Success success)
+		{
+			partidasDisponibles = success.Data
+				.Where(p => p.Jugador2Id == 0 || p.Jugador2Id == null)
+				.ToList();
+		}
+		else
+		{
+			partidasDisponibles = new List<PartidaResponse>();
+			gameService.ErrorMessage = "Error al cargar las partidas disponibles.";
+		}
+	}
+
+	private void CerrarModal()
+	{
+		mostrarModal = false;
+	}
+
+	private void PartidaSeleccionada(int partidaId)
+	{
+		partidaIdUnirse = partidaId;
+		mostrarModal = false;
+	}
+}
