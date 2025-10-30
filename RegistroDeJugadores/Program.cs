@@ -23,6 +23,17 @@ builder.Services.AddScoped<PartidasService>();
 builder.Services.AddScoped<PlayerTypeService>();
 builder.Services.AddScoped<MovimientosService>();
 
+// Inyeccion de los API Services
+builder.Services.AddHttpClient<IPartidasApiService, PartidasApiService>(client =>
+{
+    client.BaseAddress = new Uri("https://gestionhuacalesapi.azurewebsites.net/");
+});
+
+builder.Services.AddHttpClient<IMovimientosApiService, MovimientosApiService>(client =>
+{
+    client.BaseAddress = new Uri("https://gestionhuacalesapi.azurewebsites.net/");
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
