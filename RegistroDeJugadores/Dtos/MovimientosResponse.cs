@@ -1,5 +1,5 @@
 ﻿namespace RegistroDeJugadores.Dtos;
-public record MovimientoResponse(
+public record MovimientosResponse(
     int MovimientoId,
     string Jugador,
     int PosicionFila,
