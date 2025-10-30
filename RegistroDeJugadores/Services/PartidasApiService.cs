@@ -2,11 +2,6 @@
 
 namespace RegistroDeJugadores.Services;
 
-public interface IPartidasApiService
-{
-    Task<Resource<PartidasResponse>> GetPartidaAsync(int partidaId);
-}
-
 public class PartidasApiService(HttpClient httpClient) : IPartidasApiService
 {
     public async Task<Resource<PartidasResponse>> GetPartidaAsync(int partidaId)
