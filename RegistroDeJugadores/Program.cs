@@ -13,11 +13,6 @@ var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 
 builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlite(ConStr));
 
-builder.Services.AddHttpClient("ApiGestionHuacales", client =>
-{
-    client.BaseAddress = new Uri("https://gestionhuacalesapi.azurewebsites.net/");
-});
-
 builder.Services.AddScoped<JugadoresService>();
 builder.Services.AddScoped<PartidasService>();
 builder.Services.AddScoped<PlayerTypeService>();
